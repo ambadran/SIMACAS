@@ -24,22 +24,23 @@ void main(void) {
   nrf24_device(RECEIVER, RESET);
 
   // Main Routine
-  char received_payload;
-  char led_state;
-  while (1) {
+  protocol_main_loop();
+  /* char received_payload; */
+  /* char led_state; */
+  /* while (1) { */
 
-    if (nrf24_receive(&received_payload, 1) != RECEIVE_FIFO_EMPTY) {  
-      printf("\rReceived Value: %c\n", received_payload);
-      led_state = received_payload;
-    }
+  /*   if (nrf24_receive(&received_payload, 1) != RECEIVE_FIFO_EMPTY) { */  
+  /*     printf("\rReceived Value: %c\n", received_payload); */
+  /*     led_state = received_payload; */
+  /*   } */
 
-    if (led_state == '1') {
-      test_pin_on();
-    } else if (led_state == '0') {
-      test_pin_off();
-    }
+  /*   if (led_state == '1') { */
+  /*     test_pin_on(); */
+  /*   } else if (led_state == '0') { */
+  /*     test_pin_off(); */
+  /*   } */
 
-  }
+  /* } */
 
 
 

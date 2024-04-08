@@ -16,9 +16,22 @@
 // Others 
 #define SUPPRESS_delay1us_WARNING
 
+/* typedef enum { */
+/*   LINE_PASSED, */ 
+/*   LINE_FAILED */
+/* } LINE_STATUS; */
+#define LINE_PASSED 0
+#define LINE_FAILED 1
+
+
+typedef union {
+  float float_;
+  long int long_int;
+} value_t;
+
+
 
 #include <STC/8H8KxxU/SKDIP28.h>
-#include "config.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -30,6 +43,7 @@
 #include <stdio.h>
 #include "nrf24l01.h"
 #include "protocol.h"
+#include "terminal.h"
 #include "stepper_motor.h"
 
 #endif
