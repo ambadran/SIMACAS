@@ -6,14 +6,14 @@ static void protocol_execute_line(char* line) {
 
   if(line[0] == 0) {
 
-    printf("Enter Received..\n");
+    printf("\rNo Command, Only Enter Received..\n\n");
     
   } else {
 
     LINE_STATUS line_state = terminal_execute_line(line);
 
-    if (line_state == LINE_PASSED) { printf("Command passed..\n"); } 
-    else if (line_state == LINE_FAILED) { printf("Command Failed..\n'"); }
+    if (line_state == LINE_PASSED) { printf("\rCommand passed..\n\n"); } 
+    else if (line_state == LINE_FAILED) { printf("\rCommand Failed..\n\n"); }
 
   }
 
@@ -25,7 +25,12 @@ void protocol_main_loop(void) {
   uint8_t c;
   while(1) {
 
-    while ((c = uartGetCharacter(CONSOLE_UART, NON_BLOCKING)) {
+/* #ifdef DEBUG_MODE */
+/*     while (c = uartGetCharacter(CONSOLE_UART, NON_BLOCKING)) { */
+/* #else */
+    while (c = uartGetCharacter(CONSOLE_UART, NON_BLOCKING)) {
+/* #endif */
+
 
       // line end
       if ((c == '\n') || (c == '\r')) {
@@ -54,6 +59,7 @@ void protocol_main_loop(void) {
     }
 
     // Other persistant tasks to be put here..
+
    
   }
 
