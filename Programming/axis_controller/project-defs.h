@@ -31,6 +31,9 @@
 /* timer-hal configs */
 /* #define HAL_TIMER_API_STOP_TIMER */ // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
 
+/* advpwm-hal configs */
+/* #define HAL_PWM_CHANNELS // defines how much PWM channels I want to define (the less the less flash used) */
+
 // Others 
 #define SUPPRESS_delay1us_WARNING
 
@@ -45,8 +48,10 @@
 #include <serial-console.h>
 #include <stdio.h>
 #include <timer-hal.h>
+#include <advpwm-hal.h>
 #include "stepper_motor.h"
 #include "nrf24l01.h"
+#include "ultrasonic.h"
 #include "terminal.h"
 #include "protocol.h"
 
