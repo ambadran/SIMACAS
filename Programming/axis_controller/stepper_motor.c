@@ -12,6 +12,7 @@ void stepper_motor_init(void) {
 
   // GPIOs init
   gpioConfigure(&stepper_enable_pin);
+  gpioWrite(&stepper_enable_pin, STEPPER_DISABLE);
   gpioConfigure(&stepper_dir2_pin);
   gpioConfigure(&stepper_step_pin);
   gpioConfigure(&stepper_dir1_pin);

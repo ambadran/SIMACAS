@@ -199,7 +199,7 @@ uint8_t nrf24_transmit_status(void)
 
 /*the receive function output is used as a polling method to check the received data inside RX FIFOs. 
 If there is any data available, it will be loaded inside payload array*/
-uint8_t nrf24_receive(uint8_t *payload, uint8_t payload_width)
+uint8_t  nrf24_receive(uint8_t *payload, uint8_t payload_width) __reentrant
 {
   if (current_mode == PRX)
   {

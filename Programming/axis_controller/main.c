@@ -12,6 +12,8 @@ void main(void) {
       CONSOLE_SPEED, 
       CONSOLE_PIN_CONFIG
       );
+  // initialize stepper_motor
+  stepper_motor_init();
 
   // Awaiting User picocom
   // TODO: add a debug switch that switches on this code for debug mode or ignore this code for normal mode
@@ -23,9 +25,6 @@ void main(void) {
 
   //initializing nrf24l01+ as a receiver device with one simpl function call
   nrf24_device(RECEIVER, RESET);
-
-  // initialize stepper_motor
-  stepper_motor_init();
 
   // Main Routine
   protocol_main_loop();

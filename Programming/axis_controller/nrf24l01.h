@@ -201,7 +201,7 @@ void nrf24_auto_acknowledgment_setup(uint8_t datapipe);
 void nrf24_dynamic_payload(uint8_t state, uint8_t datapipe);
 void nrf24_device(uint8_t device_mode, uint8_t reset_state);
 void nrf24_send_payload(uint8_t *payload, uint8_t payload_width);
-uint8_t nrf24_receive(uint8_t *payload, uint8_t payload_width);
+uint8_t nrf24_receive(uint8_t *payload, uint8_t payload_width) __reentrant;
 uint8_t nrf24_transmit(uint8_t *payload, uint8_t payload_width, uint8_t acknowledgement_state);
 uint8_t nrf24_transmit_status(void);
 void nrf24_dynamic_ack(uint8_t state);

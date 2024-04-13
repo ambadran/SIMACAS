@@ -1,6 +1,54 @@
 #include "project-defs.h"
 
 static char line[LINE_BUFFER_SIZE];
+uint8_t char_count = 0;
+uint8_t c;
+
+// Assign myFunction to a function pointer
+uint8_t (*uart_receive_func_ptr)(uint8_t*, uint8_t) __reentrant = uartGetCharacter_modified;
+uint8_t (*nrf24_receive_func_ptr)(uint8_t*, uint8_t) __reentrant = nrf24_receive;
+
+
+static uint8_t uartGetCharacter_modified(uint8_t* data, uint8_t size) __reentrant {
+  *data = UART_RECEIVE_EMPTY;
+  uartGetBlock(CONSOLE_UART, data, size, NON_BLOCKING);
+  return *data;
+}
+
+static uint8_t protocol_read_line(uint8_t (*func)(uint8_t*, uint8_t) __reentrant, uint8_t flag_to_compare_to) {
+
+    do { 
+      // line end
+      if ((c == '\n') || (c == '\r')) {
+        line[char_count] = 0; // string termination character
+        char_count = 0;
+
+#ifdef ECHO_TERMINAL
+        uartSendCharacter(CONSOLE_UART, c, NON_BLOCKING);
+#endif
+        // executing line!
+        protocol_execute_line(line);
+
+      // throw away whitespaces and control characters
+      } else if (c <= ' '){
+        // do nothing
+
+      // buffer overflow
+      } else if (char_count >= (LINE_BUFFER_SIZE-1)) {
+
+        printf("BUFFER OVERFLOW!!!!\n");
+        char_count = 0;
+
+      // store uart_rx_buffer in line character array
+      } else {
+
+        line[char_count++] = c;
+#ifdef ECHO_TERMINAL 
+        uartSendCharacter(CONSOLE_UART, c, NON_BLOCKING);
+#endif
+      }
+    } while (func(&c, 1) != flag_to_compare_to);
+}
 
 static void protocol_execute_line(char* line) {
 
@@ -21,46 +69,18 @@ static void protocol_execute_line(char* line) {
 
 void protocol_main_loop(void) {
 
-  uint8_t char_count = 0;
-  uint8_t c;
   while(1) {
 
-/* #ifdef DEBUG_MODE */
-/*     while (c = uartGetCharacter(CONSOLE_UART, NON_BLOCKING)) { */
-/* #else */
-    while (c = uartGetCharacter(CONSOLE_UART, NON_BLOCKING)) {
-/* #endif */
+    if (uartGetCharacter_modified(&c, 1) != UART_RECEIVE_EMPTY) {
 
+      protocol_read_line(uart_receive_func_ptr, UART_RECEIVE_EMPTY);
 
-      // line end
-      if ((c == '\n') || (c == '\r')) {
-        line[char_count] = 0; // string termination character
-        char_count = 0;
+    } else if (nrf24_receive(&c, 1) != RECEIVE_FIFO_EMPTY) {
 
-        // executing line!
-        protocol_execute_line(line);
+      protocol_read_line(nrf24_receive_func_ptr, RECEIVE_FIFO_EMPTY);
 
-      // throw away whitespaces and control characters
-      } else if (c <= ' '){
-        // do nothing
-
-      // buffer overflow
-      } else if (char_count >= (LINE_BUFFER_SIZE-1)) {
-
-        printf("BUFFER OVERFLOW!!!!");
-        char_count = 0;
-
-      // store uart_rx_buffer in line character array
-      } else {
-
-        line[char_count++] = c;
-
-      }
     }
 
-    // Other persistant tasks to be put here..
-
-   
+    /* while (get_stepper_state()); // don't receive other tasks */
   }
-
 }

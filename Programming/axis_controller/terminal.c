@@ -163,8 +163,9 @@ LINE_STATUS terminal_execute_line(char* line) {
 
     case MODE_FUNC_MOVE:
 
+      // should be NEVER needed as it is tested in main loop
       if (get_stepper_state()) {
-        printf("Stepper_motor already stepper_active!\n");
+        printf("stepper_motor already stepper_active!\n");
         return LINE_FAILED;
       }
 
