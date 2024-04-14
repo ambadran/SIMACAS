@@ -23,12 +23,17 @@
 #define STEPPER_STEP_PIN 1
 #define STEPPER_DIR1_PIN 0
 #define DEFAULT_STEPPER_FREQUENCY 50
-#define STEPPER_TIMER TIMER2
-#define STEPPER_TIMER_ISR timer2_isr
-#define STEPPER_TIMER_INTERRUPT TIMER2_INTERRUPT
 #define STEPPER_CM_TO_STEPS 100 //TODO: needs testing
 
 /* timer-hal configs */
+#define STEPPER_TIMER TIMER2
+#define STEPPER_TIMER_ISR timer2_isr
+#define STEPPER_TIMER_INTERRUPT TIMER2_INTERRUPT
+
+#define ULTRASONIC_TRIGGER_TIMER TIMER3
+#define ULTRASONIC_TRIGGER_ISR timer3_isr
+#define ULTRASONIC_TRIGGER_INTERRUPT TIMER3_INTERRUPT
+
 /* #define HAL_TIMER_API_STOP_TIMER */ // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
 
 /* advpwm-hal configs */
