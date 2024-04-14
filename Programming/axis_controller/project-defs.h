@@ -16,28 +16,32 @@
 //uncomment to print all the nrf24l01 registers after setting them with nrf24_device()
 #define PRINT_NRF24_REGISTERS 
 
-/* Stepper Motor GPIO Pins */
+/* Stepper Motor Settings */
 #define STEPPER_MOTOR_PORT 2
-#define STEPPER_ENABLE_PIN 3
-#define STEPPER_DIR2_PIN 2
-#define STEPPER_STEP_PIN 1
-#define STEPPER_DIR1_PIN 0
+#define STEPPER_ENABLE_PIN 5
+#define STEPPER_DIR2_PIN 4
+#define STEPPER_STEP_PIN 3
+#define STEPPER_DIR1_PIN 2
 #define DEFAULT_STEPPER_FREQUENCY 50
 #define STEPPER_CM_TO_STEPS 100 //TODO: needs testing
 
+/* Ultrasonic Sensor Settings*/
+#define ULTRASONIC_TRIGGER_PORT 3
+#define ULTRASONIC_TRIGGER_PIN 7
+#define ULTRASONIC_ECHO_PORT 3
+#define ULTRASONIC_ECHO_PIN 6
+
+
 /* timer-hal configs */
+#define HAL_TIMER_API_STOP_TIMER // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
+                                 
 #define STEPPER_TIMER TIMER2
 #define STEPPER_TIMER_ISR timer2_isr
 #define STEPPER_TIMER_INTERRUPT TIMER2_INTERRUPT
 
-#define ULTRASONIC_TRIGGER_TIMER TIMER3
-#define ULTRASONIC_TRIGGER_ISR timer3_isr
-#define ULTRASONIC_TRIGGER_INTERRUPT TIMER3_INTERRUPT
-
-/* #define HAL_TIMER_API_STOP_TIMER */ // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
-
-/* advpwm-hal configs */
-/* #define HAL_PWM_CHANNELS // defines how much PWM channels I want to define (the less the less flash used) */
+#define ULTRASONIC_TIMER TIMER3
+#define ULTRASONIC_TIMER_ISR timer3_isr
+#define ULTRASONIC_TIMER_INTERRUPT TIMER3_INTERRUPT
 
 // Others 
 #define SUPPRESS_delay1us_WARNING
@@ -53,7 +57,6 @@
 #include <serial-console.h>
 #include <stdio.h>
 #include <timer-hal.h>
-#include <advpwm-hal.h>
 #include "stepper_motor.h"
 #include "nrf24l01.h"
 #include "ultrasonic.h"

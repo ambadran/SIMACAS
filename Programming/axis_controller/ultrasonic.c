@@ -1,7 +1,11 @@
+
 #include "project-defs.h"
 
-static volatile ULTRASONIC_STATUS ultrasonic_status = ULTRASONIC_INACTIVE;
-static volatile uint16_t last_up_time = 0;
+static ULTRASONIC_STATUS ultrasonic_status = ULTRASONIC_INACTIVE;
+volatile ULTRASONIC_PHASE ultrasonic_current_phase = 
+static volatile uint32_t ultrasonic_timer_echo_ticks = 0;
+static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASONIC_TRIGGER_PIN, GPIO_BIDIRECTIONAL_MODE); 
+static GpioConfig echo_pin = GPIO_PIN_CONFIG(ULTRASONIC_ECHO_PORT, ULTRASONIC_ECHO_PIN, GPIO_BIDIRECTIONAL_MODE);
 
 /* AS PER REQUIRED FROM THE DOCUMENTATION IN `advpwm-hal.h` file */
 #pragma save
@@ -17,8 +21,8 @@ void pwmOnChannelInterrupt(PWM_Channel channel, uint16_t HAL_PWM_SEGMENT counter
 
 /* 
  * 1- start a timer of 10us
- * 2- switch on trigger pin and enable software flag trigger_pin_flag
- * 3- upon timer interrupt, if trigger_pin_flag, switch off trigger pin, reset trigger_pin_flag and start catch_signal routine
+ * 2- enable software flag trigger_pin_flag
+ * 3- if trigger pin 
  *
  * as of this moment I am not sure how the capture mode works exactly, 
  * when it is set on PWM_CAPTURE_ON_RISING_EDGE, does it auto-magically give me the counterValue in the interrupt as the counted value from the previous rising to the now rising??
@@ -29,25 +33,94 @@ void pwmOnChannelInterrupt(PWM_Channel channel, uint16_t HAL_PWM_SEGMENT counter
  * */
 void ultrasonic_init(void) {
 
+  // Setting trigger pin GpioConfig
+  gpioConfigure(&trigger_pin);
+  gpioWrite(&trigger_pin, 0);
+
+  // Setting echo pin GpioConfig
+  gpioConfigure(&echo_pin);
+
+}
+
+void static ultrasonic_send_trigger(void) {
+
+  gpioWrite(&trigger_pin, 1);
+
   startTimer(
-      ULTRASONIC_TRIGGER_TIMER,
+      ULTRASONIC_TIMER,
       frequencyToSysclkDivisor(ULTRASONIC_TRIGGER_ON_TIME),
       DISABLE_OUTPUT, 
       ENABLE_INTERRUPT, 
       FREE_RUNNING
       );
 
+  ultrasonic_current_phase = ULTRASONIC_TRIGGER_SENT_PHASE;
+
+}
+
+
+void static ultrasonic_await_echo(void) {
+
+  gpioWrite(&trigger_pin, 0);
+  stopTimer(ULTRASONIC_TIMER);
+  ultrasonic_current_phase = ULTRASONIC_AWAITING_ECHO_PHASE;
+
+}
+
+void processs_ultrasonic_phases(void) {
+  switch (ultrasonic_current_phase) {
+    case ULTRASONIC_TRIGGER_PHASE:
+
+      ultrasonic_send_trigger();
+      break;
+
+
+    case ULTRASONIC_AWAITING_ECHO_PHASE:
+
+      ultrasonic_await_echo();
+      break;
+
+  }
 }
 
 ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
 
-  *distance = last_up_time*ULTRASONIC_COUNTER_TO_CM;
-  return ultrasonic_status;
+  if (ultrasonic_cycle_on) {
+
+    // if it's ULTRASONIC_IDLE, then it means it's probably the first cycle so still idle (i think)
+    if (ultrasonic_status == ULTRASONIC_ACTIVE) {
+
+      *distance = ultrasonic_timer_echo_ticks*ULTRASONIC_COUNTER_TO_CM;
+
+    }
+
+    return ultrasonic_status;
+
+  } else {
+
+    // no value distance value set if ultrasonic_cycle is not turned on, in other words can't have a one time measurement, it's either always measuring and the user can call the latest distance measured or no value will be set
+    return ULTRASONIC_IDLE;
+
+  }
 
 }
 
-INTERRUPT(ULTRASONIC_TRIGGER_ISR, ULTRASONIC_TRIGGER_INTERRUPT) {
+INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
 
+  if(ultrasonic_current_phase == ULTRASONIC_TRIGGER_SENT_PHASE) {
+
+    ultrasonic_current_phase = ULTRASONIC_AWAITING_ECHO_RISE_PHASE;
+
+  }
 
 }
 
+INTERRUPT(int_pin) {
+
+  if(ultrasonic_current_phase == ULTRASONIC_AWAITING_ECHO_RISE_PHASE) {
+
+    ultrasonic_current_phase
+
+  }
+
+}
