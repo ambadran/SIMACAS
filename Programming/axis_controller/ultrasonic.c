@@ -1,36 +1,22 @@
 
 #include "project-defs.h"
 
-static ULTRASONIC_STATUS ultrasonic_status = ULTRASONIC_INACTIVE;
-volatile ULTRASONIC_PHASE ultrasonic_current_phase = 
+// this variable controls whether ultrasonic will be constantly working or not
+static bool ultrasonic_cycle_on = false;
+                                         
+static ULTRASONIC_STATUS ultrasonic_status = ULTRASONIC_IDLE;
+
+static volatile ULTRASONIC_PHASE ultrasonic_current_phase = ULTRASONIC_SEND_TRIGGER_PHASE;
+
 static volatile uint32_t ultrasonic_timer_echo_ticks = 0;
+
 static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASONIC_TRIGGER_PIN, GPIO_BIDIRECTIONAL_MODE); 
-static GpioConfig echo_pin = GPIO_PIN_CONFIG(ULTRASONIC_ECHO_PORT, ULTRASONIC_ECHO_PIN, GPIO_BIDIRECTIONAL_MODE);
 
-/* AS PER REQUIRED FROM THE DOCUMENTATION IN `advpwm-hal.h` file */
-#pragma save
-// Suppress warning "unreferenced function argument"
-#pragma disable_warning 85
-void pwmOnCounterInterrupt(PWM_Counter counter, PWM_CounterInterrupt HAL_PWM_SEGMENT event) {
-}
+// enabling interrupt with rising edge detection first
+// echo_pin.interruptTrigger = GPIO_FALLING_EDGE;  // change it to detecting rising edge
+static GpioConfig echo_pin = { .port = ULTRASONIC_ECHO_PORT, .pin = ULTRASONIC_ECHO_PIN, .count = 1, .pinMode = GPIO_BIDIRECTIONAL_MODE,	.pinInterrupt = ENABLE_GPIO_PIN_INTERRUPT, .interruptTrigger = GPIO_RISING_EDGE, .wakeUpInterrupt = DISABLE_GPIO_PIN_WAKE_UP, \
+	DEFAULTS_PU_NCS  DEFAULTS_SR_DR_IE  };
 
-void pwmOnChannelInterrupt(PWM_Channel channel, uint16_t HAL_PWM_SEGMENT counterValue) {
-
-}
-#pragma restore
-
-/* 
- * 1- start a timer of 10us
- * 2- enable software flag trigger_pin_flag
- * 3- if trigger pin 
- *
- * as of this moment I am not sure how the capture mode works exactly, 
- * when it is set on PWM_CAPTURE_ON_RISING_EDGE, does it auto-magically give me the counterValue in the interrupt as the counted value from the previous rising to the now rising??
- * if so then the next steps would be
- *
- * 4- enable software flag awaiting_echo in another timer to wait 30ms, if no trigger is catched then global ultrasonic_status variable is set to ULTRASONIC_INACTIVE
- * 5- capture module interrupt sets the counted value and lowers the awaiting_echo flag and sets the global ultrasonic_status to ULTRASONIC_ACTIVE
- * */
 void ultrasonic_init(void) {
 
   // Setting trigger pin GpioConfig
@@ -42,48 +28,54 @@ void ultrasonic_init(void) {
 
 }
 
+void ultrasonic_start_sequence(void) {
+
+}
+
+void ultrasonic_stop_sequence(void) {
+
+}
+
 void static ultrasonic_send_trigger(void) {
 
-  gpioWrite(&trigger_pin, 1);
+}
 
-  startTimer(
-      ULTRASONIC_TIMER,
-      frequencyToSysclkDivisor(ULTRASONIC_TRIGGER_ON_TIME),
-      DISABLE_OUTPUT, 
-      ENABLE_INTERRUPT, 
-      FREE_RUNNING
-      );
-
-  ultrasonic_current_phase = ULTRASONIC_TRIGGER_SENT_PHASE;
+void static ultrasonic_await_echo_rise(void) {
 
 }
 
-
-void static ultrasonic_await_echo(void) {
-
-  gpioWrite(&trigger_pin, 0);
-  stopTimer(ULTRASONIC_TIMER);
-  ultrasonic_current_phase = ULTRASONIC_AWAITING_ECHO_PHASE;
+void static ultrasonic_await_echo_fall(void) {
 
 }
+
 
 void processs_ultrasonic_phases(void) {
-  switch (ultrasonic_current_phase) {
-    case ULTRASONIC_TRIGGER_PHASE:
 
-      ultrasonic_send_trigger();
-      break;
+  if (ultrasonic_cycle_on) {
 
+    switch (ultrasonic_current_phase) {
 
-    case ULTRASONIC_AWAITING_ECHO_PHASE:
+      case ULTRASONIC_SEND_TRIGGER_PHASE:
+        ultrasonic_send_trigger();
+        break;
 
-      ultrasonic_await_echo();
-      break;
+      case ULTRASONIC_TRIGGER_SENT_PHASE:
+        ultrasonic_await_echo_rise();
+        break;
 
+      case ULTRASONIC_ECHO_RISE_CAPTURED_PHASE:
+        ultrasonic_await_echo_fall();
+        break;
+
+      case ULTRASONIC_ECHO_FALL_CAPTURED_PHASE:
+        ultrasonic_start_sequence();
+        break;
+    }
   }
 }
 
-ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
+ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance)
+{
 
   if (ultrasonic_cycle_on) {
 
@@ -107,19 +99,36 @@ ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
 
 INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
 
-  if(ultrasonic_current_phase == ULTRASONIC_TRIGGER_SENT_PHASE) {
+  switch (ultrasonic_current_phase) {
 
-    ultrasonic_current_phase = ULTRASONIC_AWAITING_ECHO_RISE_PHASE;
+    case ULTRASONIC_AWAIT_TRIGGER_PHASE:
+      ultrasonic_current_phase = ULTRASONIC_TRIGGER_SENT_PHASE;
+      // is there sth else to do here??
+      break;
+
+    case ULTRASONIC_AWAIT_ECHO_RISE_PHASE:
+      // time out error, ULTRASONIC_UNRESPONSIVE !!
+      break;
+
+    case ULTRASONIC_AWAIT_ECHO_FALL_PHASE
+      // time out error, ULTRASONIC_UNRESPONSIVE !!
+      break;
 
   }
 
 }
 
-INTERRUPT(int_pin) {
+INTERRUPT(ULTRASONIC_INT_PIN_ISR, ULTRASONIC_INT_PIN_INTERRUPT) {
 
-  if(ultrasonic_current_phase == ULTRASONIC_AWAITING_ECHO_RISE_PHASE) {
+  switch (ultrasonic_current_phase) {
 
-    ultrasonic_current_phase
+    case ULTRASONIC_AWAIT_ECHO_RISE_PHASE:
+      //TODO:
+      break;
+
+    case ULTRASONIC_AWAIT_ECHO_FALL_PHASE:
+      //TODO:
+      break;
 
   }
 

@@ -34,7 +34,6 @@
 
 /* timer-hal configs */
 #define HAL_TIMER_API_STOP_TIMER // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
-                                 
 #define STEPPER_TIMER TIMER2
 #define STEPPER_TIMER_ISR timer2_isr
 #define STEPPER_TIMER_INTERRUPT TIMER2_INTERRUPT
@@ -42,6 +41,10 @@
 #define ULTRASONIC_TIMER TIMER3
 #define ULTRASONIC_TIMER_ISR timer3_isr
 #define ULTRASONIC_TIMER_INTERRUPT TIMER3_INTERRUPT
+
+/* external pin interrupts */
+#define ULTRASONIC_INT_PIN_ISR extint0_isr
+#define ULTRASONIC_INT_PIN_INTERRUPT EXTINT0_INTERRUPT
 
 // Others 
 #define SUPPRESS_delay1us_WARNING

@@ -82,9 +82,7 @@ void protocol_main_loop(void) {
     }
 
     // ultrasonic_reading
-    if(ultrasonic_cycle_on) {
-      processs_ultrasonic_phases();
-    }
+    processs_ultrasonic_phases();
 
     /* while (get_stepper_state()); // don't receive other tasks */
   }
