@@ -28,7 +28,7 @@ void stepper_motor_init(void) {
 
 }
 
-void stepper_motor_set_freq(uint16_t frequency) {
+void stepper_motor_set_freq(uint32_t frequency) {
   /* stopTimer(STEPPER_TIMER); */
 	startTimer(
 		STEPPER_TIMER, 

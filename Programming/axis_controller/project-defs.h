@@ -33,7 +33,8 @@
 
 
 /* timer-hal configs */
-#define HAL_TIMER_API_STOP_TIMER // if set_frequency doesn't work, try stopTimer then startTimer (restarting it)
+#define HAL_TIMER_API_STOP_TIMER
+
 #define STEPPER_TIMER TIMER2
 #define STEPPER_TIMER_ISR timer2_isr
 #define STEPPER_TIMER_INTERRUPT TIMER2_INTERRUPT

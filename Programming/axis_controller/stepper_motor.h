@@ -14,7 +14,7 @@ typedef enum {
 
 
 void stepper_motor_init(void);
-void stepper_motor_set_freq(uint16_t frequency);
+void stepper_motor_set_freq(uint32_t frequency);
 void stepper_motor_move(movement_type_t movement_type, int16_t distance);
 uint8_t get_stepper_state(void);
 

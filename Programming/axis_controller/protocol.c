@@ -15,7 +15,7 @@ static uint8_t uartGetCharacter_modified(uint8_t* data, uint8_t size) __reentran
   return *data;
 }
 
-static uint8_t protocol_read_line(uint8_t (*func)(uint8_t*, uint8_t) __reentrant, uint8_t flag_to_compare_to) {
+static void protocol_read_line(uint8_t (*func)(uint8_t*, uint8_t) __reentrant, uint8_t flag_to_compare_to) {
 
     do { 
       // line end

@@ -30,28 +30,93 @@ void ultrasonic_init(void) {
 
 void ultrasonic_start_sequence(void) {
 
+  // Process ultrasonic status state machine
+  switch (ultrasonic_status) {
+
+    case ULTRASONIC_IDLE:
+      ultrasonic_status = ULTRASONIC_FIRST_RUN;
+      break;
+
+    case ULTRASONIC_ACTIVE:
+    case ULTRASONIC_UNRESPONSIVE:
+      // restarts ultrasonic_current_phase whatever it was before
+      ultrasonic_current_phase = ULTRASONIC_SEND_TRIGGER_PHASE;
+      break;
+
+    case ULTRASONIC_FIRST_RUN:
+      while(1) { printf("WTF?!?!, ultrasonic_status is first run?!?!?\n"); }
+  }
+
 }
 
 void ultrasonic_stop_sequence(void) {
+
+  ultrasonic_status = ULTRASONIC_IDLE;  // phase processing is halted
+                                        //
+  ultrasonic_current_phase = ULTRASONIC_SEND_TRIGGER_PHASE; // first phase, no interrupts is triggered
+  
+  stopTimer(ULTRASONIC_TIMER);  // stopping it just for good measure
 
 }
 
 void static ultrasonic_send_trigger(void) {
 
+  gpioWrite(&trigger_pin, 1);
+
+  startTimer(
+      ULTRASONIC_TIMER, 
+      frequencyToSysclkDivisor(PERIOD_us_TO_FREQ_INT(ULTRASONIC_TRIGGER_ON_TIME_us)),
+      DISABLE_OUTPUT, 
+      ENABLE_INTERRUPT, 
+      FREE_RUNNING
+      );
+
+  ultrasonic_current_phase = ULTRASONIC_AWAIT_TRIGGER_PHASE;
+
 }
 
 void static ultrasonic_await_echo_rise(void) {
 
+  // Time-out timer if no echo rise detected
+  startTimer(
+      ULTRASONIC_TIMER, 
+      frequencyToSysclkDivisor(PERIOD_us_TO_FREQ_INT(ECHO_RISE_TIMEOUT_us)),
+      DISABLE_OUTPUT, 
+      ENABLE_INTERRUPT, 
+      FREE_RUNNING
+      );
+
+  // changing to interrupt on rising edge if it was changed by a previous phase
+  echo_pin.interruptTrigger = GPIO_RISING_EDGE; 
+  gpioConfigure(&echo_pin);
+
+  ultrasonic_current_phase = ULTRASONIC_AWAIT_ECHO_RISE_PHASE;
+
 }
 
 void static ultrasonic_await_echo_fall(void) {
+
+  // Time-out timer if no echo rise detected
+  startTimer(
+      ULTRASONIC_TIMER, 
+      frequencyToSysclkDivisor(PERIOD_us_TO_FREQ_INT(ECHO_FALL_TIMEOUT_us)),
+      DISABLE_OUTPUT, 
+      ENABLE_INTERRUPT, 
+      FREE_RUNNING
+      );
+
+  // changing to interrupt on falling edge if it was changed by a previous phase
+  echo_pin.interruptTrigger = GPIO_FALLING_EDGE; 
+  gpioConfigure(&echo_pin);
+
+  ultrasonic_current_phase = ULTRASONIC_AWAIT_ECHO_FALL_PHASE;
 
 }
 
 
 void processs_ultrasonic_phases(void) {
 
-  if (ultrasonic_cycle_on) {
+  if (ultrasonic_status != ULTRASONIC_IDLE) {
 
     switch (ultrasonic_current_phase) {
 
@@ -68,18 +133,15 @@ void processs_ultrasonic_phases(void) {
         break;
 
       case ULTRASONIC_ECHO_FALL_CAPTURED_PHASE:
+      case ULTRASONIC_ECHO_TIMEOUT_PHASE:
         ultrasonic_start_sequence();
         break;
     }
   }
 }
 
-ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance)
-{
+ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
 
-  if (ultrasonic_cycle_on) {
-
-    // if it's ULTRASONIC_IDLE, then it means it's probably the first cycle so still idle (i think)
     if (ultrasonic_status == ULTRASONIC_ACTIVE) {
 
       *distance = ultrasonic_timer_echo_ticks*ULTRASONIC_COUNTER_TO_CM;
@@ -88,13 +150,6 @@ ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance)
 
     return ultrasonic_status;
 
-  } else {
-
-    // no value distance value set if ultrasonic_cycle is not turned on, in other words can't have a one time measurement, it's either always measuring and the user can call the latest distance measured or no value will be set
-    return ULTRASONIC_IDLE;
-
-  }
-
 }
 
 INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
@@ -102,16 +157,20 @@ INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
   switch (ultrasonic_current_phase) {
 
     case ULTRASONIC_AWAIT_TRIGGER_PHASE:
+      gpioWrite(&trigger_pin, 0);
       ultrasonic_current_phase = ULTRASONIC_TRIGGER_SENT_PHASE;
-      // is there sth else to do here??
       break;
 
     case ULTRASONIC_AWAIT_ECHO_RISE_PHASE:
       // time out error, ULTRASONIC_UNRESPONSIVE !!
+      ultrasonic_status = ULTRASONIC_UNRESPONSIVE;  // update state
+      ultrasonic_current_phase = ULTRASONIC_ECHO_TIMEOUT_PHASE;  // restarting cycle
       break;
 
-    case ULTRASONIC_AWAIT_ECHO_FALL_PHASE
+    case ULTRASONIC_AWAIT_ECHO_FALL_PHASE:
       // time out error, ULTRASONIC_UNRESPONSIVE !!
+      ultrasonic_status = ULTRASONIC_UNRESPONSIVE;  // update state
+      ultrasonic_current_phase = ULTRASONIC_ECHO_TIMEOUT_PHASE;  // restarting cycle
       break;
 
   }
@@ -123,11 +182,13 @@ INTERRUPT(ULTRASONIC_INT_PIN_ISR, ULTRASONIC_INT_PIN_INTERRUPT) {
   switch (ultrasonic_current_phase) {
 
     case ULTRASONIC_AWAIT_ECHO_RISE_PHASE:
-      //TODO:
+      ultrasonic_current_phase = ULTRASONIC_ECHO_RISE_CAPTURED_PHASE;
       break;
 
     case ULTRASONIC_AWAIT_ECHO_FALL_PHASE:
-      //TODO:
+      ultrasonic_timer_echo_ticks = stopTimer(ULTRASONIC_TIMER); // gotcha bitch :D
+      ultrasonic_current_phase = ULTRASONIC_ECHO_FALL_CAPTURED_PHASE;
+      ultrasonic_status = ULTRASONIC_ACTIVE;
       break;
 
   }

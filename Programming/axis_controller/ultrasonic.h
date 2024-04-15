@@ -2,11 +2,15 @@
 #define ULTRASONIC_H
 
 #define ULTRASONIC_COUNTER_TO_CM  233 //TODO: actually calculate and get this value
-#define ULTRASONIC_TRIGGER_ON_TIME 10UL  // 10ms TODO: is this really 10us ?!
+#define ULTRASONIC_TRIGGER_ON_TIME_us 10  // 10us TODO: is this really 10us ?!
+#define ECHO_RISE_TIMEOUT_us 30 // 30us wait until echo rise
+#define ECHO_FALL_TIMEOUT_us 30000 // 30ms
+#define PERIOD_us_TO_FREQ_INT(us) ((us) != 0 ? (1000000 + (us) / 2) / (us) : 0)
                                          
 
 /* this status enum will be used to return whether a working ultrasonic is connected or not */
 typedef enum {
+  ULTRASONIC_FIRST_RUN,
   ULTRASONIC_ACTIVE,
   ULTRASONIC_IDLE,
   ULTRASONIC_UNRESPONSIVE
@@ -19,7 +23,8 @@ typedef enum {
   ULTRASONIC_AWAIT_ECHO_RISE_PHASE,
   ULTRASONIC_ECHO_RISE_CAPTURED_PHASE,
   ULTRASONIC_AWAIT_ECHO_FALL_PHASE,
-  ULTRASONIC_ECHO_FALL_CAPTURED_PHASE
+  ULTRASONIC_ECHO_FALL_CAPTURED_PHASE, 
+  ULTRASONIC_ECHO_TIMEOUT_PHASE
 } ULTRASONIC_PHASE;
 
 
