@@ -16,4 +16,4 @@ __pychache__
 *.kicad_prl
 *.lck
 *auto_saved_files*
-
+~$*.xlsx
