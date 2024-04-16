@@ -17,6 +17,24 @@ static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASO
 static GpioConfig echo_pin = { .port = ULTRASONIC_ECHO_PORT, .pin = ULTRASONIC_ECHO_PIN, .count = 1, .pinMode = GPIO_BIDIRECTIONAL_MODE,	.pinInterrupt = ENABLE_GPIO_PIN_INTERRUPT, .interruptTrigger = GPIO_RISING_EDGE, .wakeUpInterrupt = DISABLE_GPIO_PIN_WAKE_UP, \
 	DEFAULTS_PU_NCS  DEFAULTS_SR_DR_IE  };
 
+const char* ULTRASONIC_STATUS_TO_STRING[] = {
+  "ULTRASONIC_FIRST_RUN",
+  "ULTRASONIC_ACTIVE",
+  "ULTRASONIC_IDLE",
+  "ULTRASONIC_UNRESPONSIVE" 
+};
+
+const char* ULTRASONIC_PHASE_TO_STRING[] = {
+  "ULTRASONIC_SEND_TRIGGER_PHASE",
+  "ULTRASONIC_AWAIT_TRIGGER_PHASE",
+  "ULTRASONIC_TRIGGER_SENT_PHASE",
+  "ULTRASONIC_AWAIT_ECHO_RISE_PHASE",
+  "ULTRASONIC_ECHO_RISE_CAPTURED_PHASE",
+  "ULTRASONIC_AWAIT_ECHO_FALL_PHASE",
+  "ULTRASONIC_ECHO_FALL_CAPTURED_PHASE", 
+  "ULTRASONIC_ECHO_TIMEOUT_PHASE" 
+};
+
 void ultrasonic_init(void) {
 
   // Setting trigger pin GpioConfig
@@ -143,9 +161,7 @@ void processs_ultrasonic_phases(void) {
 ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
 
     if (ultrasonic_status == ULTRASONIC_ACTIVE) {
-
       *distance = ultrasonic_timer_echo_ticks*ULTRASONIC_COUNTER_TO_CM;
-
     }
 
     return ultrasonic_status;

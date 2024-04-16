@@ -15,6 +15,7 @@ typedef enum {
   ULTRASONIC_IDLE,
   ULTRASONIC_UNRESPONSIVE
 } ULTRASONIC_STATUS;
+extern const char* ULTRASONIC_STATUS_TO_STRING[];
 
 typedef enum {
   ULTRASONIC_SEND_TRIGGER_PHASE,
@@ -26,7 +27,7 @@ typedef enum {
   ULTRASONIC_ECHO_FALL_CAPTURED_PHASE, 
   ULTRASONIC_ECHO_TIMEOUT_PHASE
 } ULTRASONIC_PHASE;
-
+extern const char* ULTRASONIC_PHASE_TO_STRING[];
 
 void ultrasonic_init(void);
 void ultrasonic_start_sequence(void); // sets global flag

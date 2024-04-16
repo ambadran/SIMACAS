@@ -144,10 +144,48 @@ LINE_STATUS terminal_execute_line(char* line) {
 
         break;
 
+      case 'U':
+        // reading int argument for a multi-argument command
+        if (!read_int(line, &char_count, &int_value)) {
+          printf("Bad int Number Format\n");
+          return LINE_FAILED;
+        }
+
+        switch(int_value) {
+
+          case 0:
+            ultrasonic_stop_sequence();
+            break;
+
+          case 1:
+            ultrasonic_start_sequence();
+            break;
+
+          default:
+            printf("Unknown integer value");
+            break;
+
+        }
+        break;
+
+      case 'D':
+        uint16_t dist;
+        ULTRASONIC_STATUS ultrasonic_current_status = ultrasonic_get_distance(&dist);
+
+        if (ultrasonic_current_status == ULTRASONIC_ACTIVE) {
+
+          printf("Ultrasonic Sensor is Active, Distance: %dcm \n", dist);
+
+        } else {
+
+          printf("Ultrasonic status: %s\n", ULTRASONIC_STATUS_TO_STRING[ultrasonic_current_status]);
+
+        }
+        break;
+
       default:
         printf("Command Letter Not Implemented\n");
         return LINE_FAILED;
-
     }
 
   }

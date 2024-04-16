@@ -27,9 +27,9 @@
 
 /* Ultrasonic Sensor Settings*/
 #define ULTRASONIC_TRIGGER_PORT 3
-#define ULTRASONIC_TRIGGER_PIN 7
+#define ULTRASONIC_TRIGGER_PIN 3
 #define ULTRASONIC_ECHO_PORT 3
-#define ULTRASONIC_ECHO_PIN 6
+#define ULTRASONIC_ECHO_PIN 2
 
 
 /* timer-hal configs */
