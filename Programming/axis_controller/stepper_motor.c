@@ -17,15 +17,6 @@ void stepper_motor_init(void) {
   gpioConfigure(&stepper_step_pin);
   gpioConfigure(&stepper_dir1_pin);
 
-  // Timer init
-	startTimer(
-		STEPPER_TIMER, 
-		frequencyToSysclkDivisor(DEFAULT_STEPPER_FREQUENCY),
-		DISABLE_OUTPUT, 
-		ENABLE_INTERRUPT, 
-		FREE_RUNNING
-	);
-
 }
 
 void stepper_motor_set_freq(uint32_t frequency) {
@@ -64,6 +55,16 @@ void stepper_motor_move(movement_type_t movement_type, int16_t distance) {
     printf("Steps to move: %d \n", step_counter);
 
   }
+  // Timer init
+	startTimer(
+		STEPPER_TIMER, 
+		frequencyToSysclkDivisor(DEFAULT_STEPPER_FREQUENCY),
+		DISABLE_OUTPUT, 
+		ENABLE_INTERRUPT, 
+		FREE_RUNNING
+	);
+
+
 
 }
 
@@ -85,6 +86,7 @@ INTERRUPT(STEPPER_TIMER_ISR, STEPPER_TIMER_INTERRUPT) {
 
     gpioWrite(&stepper_enable_pin, STEPPER_DISABLE);
     stepper_active = 0;
+    stopTimer(STEPPER_TIMER);
 
   }
 

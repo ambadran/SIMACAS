@@ -1,6 +1,7 @@
 
 #include "project-defs.h"
 
+#if ULTRASONIC_STATE_MACHINE
 // this variable controls whether ultrasonic will be constantly working or not
 static bool ultrasonic_cycle_on = false;
                                          
@@ -8,7 +9,7 @@ static ULTRASONIC_STATUS ultrasonic_status = ULTRASONIC_IDLE;
 
 static volatile ULTRASONIC_PHASE ultrasonic_current_phase = ULTRASONIC_SEND_TRIGGER_PHASE;
 
-static volatile uint32_t ultrasonic_timer_echo_ticks = 0;
+static uint32_t ultrasonic_timer_echo_ticks = 0;
 
 static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASONIC_TRIGGER_PIN, GPIO_BIDIRECTIONAL_MODE); 
 
@@ -134,12 +135,19 @@ void static ultrasonic_await_echo_fall(void) {
 
 void processs_ultrasonic_phases(void) {
 
+
   if (ultrasonic_status != ULTRASONIC_IDLE) {
+
+    /* printf("Current Ultrasonic status: %s\n", ULTRASONIC_STATUS_TO_STRING[ultrasonic_status]); */
+    /* printf("Current Ultrasonic Phase: %s\n", ULTRASONIC_PHASE_TO_STRING[ultrasonic_current_phase]); */
 
     switch (ultrasonic_current_phase) {
 
       case ULTRASONIC_SEND_TRIGGER_PHASE:
         ultrasonic_send_trigger();
+        /* printf("Ultrasonic status: %d\n", ultrasonic_status); */
+        /* printf("Ultrasonic Phase: %d\n", ultrasonic_current_phase); */
+
         break;
 
       case ULTRASONIC_TRIGGER_SENT_PHASE:
@@ -169,6 +177,7 @@ ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance) {
 }
 
 INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
+  /* uartGetCharacter(CONSOLE_UART, 'E', NON_BLOCKING); */
 
   switch (ultrasonic_current_phase) {
 
@@ -194,6 +203,7 @@ INTERRUPT(ULTRASONIC_TIMER_ISR, ULTRASONIC_TIMER_INTERRUPT) {
 }
 
 INTERRUPT(ULTRASONIC_INT_PIN_ISR, ULTRASONIC_INT_PIN_INTERRUPT) {
+  /* uartGetCharacter(CONSOLE_UART, 'Q', NON_BLOCKING); */
 
   switch (ultrasonic_current_phase) {
 
@@ -210,3 +220,30 @@ INTERRUPT(ULTRASONIC_INT_PIN_ISR, ULTRASONIC_INT_PIN_INTERRUPT) {
   }
 
 }
+#else
+static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASONIC_TRIGGER_PIN, GPIO_BIDIRECTIONAL_MODE); 
+static GpioConfig echo_pin = GPIO_PIN_CONFIG(ULTRASONIC_ECHO_PORT, ULTRASONIC_ECHO_PIN, GPIO_BIDIRECTIONAL_MODE);
+
+void ultrasonic_init(void) {
+
+  // Setting trigger pin GpioConfig
+  gpioConfigure(&trigger_pin);
+  gpioWrite(&trigger_pin, 0);
+
+  // Setting echo pin GpioConfig
+  gpioConfigure(&echo_pin);
+
+}
+
+void ultrasonic_get_distance(uint16_t* distance) {
+
+  gpioWrite(&trigger_pin, 1);
+  delay1us(10);
+  gpioWrite(&trigger_pin, 0);
+
+
+ *distance = 10*ULTRASONIC_COUNTER_TO_CM;
+
+}
+
+#endif

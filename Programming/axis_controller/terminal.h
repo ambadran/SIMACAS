@@ -5,6 +5,7 @@
 
 #define MODE_FUNC_NONE 0
 #define MODE_FUNC_MOVE 1
+#define MODE_FUNC_ULTRASONIC 2
 
 typedef enum {
   LINE_PASSED, 

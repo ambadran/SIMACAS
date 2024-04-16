@@ -3,6 +3,8 @@
 
 #define ULTRASONIC_COUNTER_TO_CM  233 //TODO: actually calculate and get this value
 #define ULTRASONIC_TRIGGER_ON_TIME_us 10  // 10us TODO: is this really 10us ?!
+
+#ifdef ULTRASONIC_STATE_MACHINE
 #define ECHO_RISE_TIMEOUT_us 30 // 30us wait until echo rise
 #define ECHO_FALL_TIMEOUT_us 30000 // 30ms
 #define PERIOD_us_TO_FREQ_INT(us) ((us) != 0 ? (1000000 + (us) / 2) / (us) : 0)
@@ -37,5 +39,11 @@ void static ultrasonic_await_echo_rise(void);
 void static ultrasonic_await_echo_fall(void);
 void processs_ultrasonic_phases(void);
 ULTRASONIC_STATUS ultrasonic_get_distance(uint16_t* distance);
+
+#else
+
+void ultrasonic_init(void);
+void ultrasonic_get_distance(uint16_t* distance);
+#endif
 
 #endif

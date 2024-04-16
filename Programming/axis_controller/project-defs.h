@@ -18,10 +18,10 @@
 
 /* Stepper Motor Settings */
 #define STEPPER_MOTOR_PORT 2
-#define STEPPER_ENABLE_PIN 5
-#define STEPPER_DIR2_PIN 4
-#define STEPPER_STEP_PIN 3
-#define STEPPER_DIR1_PIN 2
+#define STEPPER_ENABLE_PIN 3
+#define STEPPER_DIR2_PIN 2
+#define STEPPER_STEP_PIN 1
+#define STEPPER_DIR1_PIN 0
 #define DEFAULT_STEPPER_FREQUENCY 50
 #define STEPPER_CM_TO_STEPS 100 //TODO: needs testing
 
@@ -30,6 +30,8 @@
 #define ULTRASONIC_TRIGGER_PIN 3
 #define ULTRASONIC_ECHO_PORT 3
 #define ULTRASONIC_ECHO_PIN 2
+
+/* #define ULTRASONIC_STATE_MACHINE */
 
 
 /* timer-hal configs */
@@ -48,7 +50,8 @@
 #define ULTRASONIC_INT_PIN_INTERRUPT EXTINT0_INTERRUPT
 
 // Others 
-#define SUPPRESS_delay1us_WARNING
+#define LED_PORT 2
+#define LED_PIN 5
 
 #include <STC/8H8KxxU/SKDIP28.h>
 #include <stdio.h>

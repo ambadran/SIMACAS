@@ -81,6 +81,12 @@ LINE_STATUS terminal_execute_line(char* line) {
   // To know whether to execute arg func routine or not
   uint8_t mode_func_ind = MODE_FUNC_NONE;
 
+  // ultrasonic stuff
+  uint16_t ultrasonic_dist = 0;
+#if ULTRASONIC_STATE_MACHINE
+  ULTRASONIC_STATUS ultrasonic_current_status = ultrasonic_get_distance(&ultrasonic_dist);
+#endif
+
   while (line[char_count] != 0) {
 
     // Reading letter argument, aka which function to execute
@@ -144,6 +150,7 @@ LINE_STATUS terminal_execute_line(char* line) {
 
         break;
 
+#if ULTRASONIC_STATE_MACHINE
       case 'U':
         // reading int argument for a multi-argument command
         if (!read_int(line, &char_count, &int_value)) {
@@ -155,32 +162,44 @@ LINE_STATUS terminal_execute_line(char* line) {
 
           case 0:
             ultrasonic_stop_sequence();
+            printf("Ultrasonic Sensor Cycle Stopped!\n");
             break;
 
           case 1:
             ultrasonic_start_sequence();
+            printf("Ultrasonic Sensor Cycle Starting!\n");
             break;
 
           default:
-            printf("Unknown integer value");
+            printf("Ultrasonic is either ON (1) or OFF (0)\n");
             break;
 
         }
         break;
+#endif
 
       case 'D':
-        uint16_t dist;
-        ULTRASONIC_STATUS ultrasonic_current_status = ultrasonic_get_distance(&dist);
+        // reading int argument for a multi-argument command
+        if (!read_int(line, &char_count, &int_value)) {
+          printf("Bad int Number Format\n");
+          return LINE_FAILED;
+        }
+
+#if ULTRASONIC_STATE_MACHINE
+        ultrasonic_current_status = ultrasonic_get_distance(&ultrasonic_dist);
 
         if (ultrasonic_current_status == ULTRASONIC_ACTIVE) {
 
-          printf("Ultrasonic Sensor is Active, Distance: %dcm \n", dist);
+          printf("Ultrasonic Sensor is Active, Distance: %dcm \n", ultrasonic_dist);
 
         } else {
 
           printf("Ultrasonic status: %s\n", ULTRASONIC_STATUS_TO_STRING[ultrasonic_current_status]);
 
         }
+#else
+        mode_func_ind = MODE_FUNC_ULTRASONIC;
+#endif
         break;
 
       default:
@@ -230,6 +249,11 @@ LINE_STATUS terminal_execute_line(char* line) {
       stepper_motor_move(movement_type, distance);
 
       break;
+
+    case MODE_FUNC_ULTRASONIC:
+      printf("starting..\n");
+      ultrasonic_get_distance(&ultrasonic_dist);
+      printf("Ultrasonic measured distance: %dcm \n", ultrasonic_dist);
 
   }
 
