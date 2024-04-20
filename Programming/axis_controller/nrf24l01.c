@@ -24,8 +24,8 @@ const uint8_t bitReverseTable256[256] = {
 
 /*global variables related to this file*/
 volatile bool dataReady = 0;
-GpioConfig CSN_pin = GPIO_PIN_CONFIG(GPIO_PORT2, GPIO_PIN6, GPIO_BIDIRECTIONAL_MODE);
-GpioConfig CE_pin = GPIO_PIN_CONFIG(GPIO_PORT2, GPIO_PIN7, GPIO_BIDIRECTIONAL_MODE);
+GpioConfig CSN_pin = GPIO_PIN_CONFIG(NRF24_CSN_PORT, NRF24_CSN_PIN, GPIO_BIDIRECTIONAL_MODE);
+GpioConfig CE_pin = GPIO_PIN_CONFIG(NRF24_CE_PORT, NRF24_CE_PIN, GPIO_BIDIRECTIONAL_MODE);
 
 static uint8_t SPI_command;                                       /*1 byte spi command*/
 static uint8_t register_current_value;                            /*in order to change some bits of internal registers or to check their content*/

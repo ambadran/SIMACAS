@@ -15,6 +15,10 @@
  /* nRF24L01 settings */
 //uncomment to print all the nrf24l01 registers after setting them with nrf24_device()
 #define PRINT_NRF24_REGISTERS 
+#define NRF24_CSN_PORT 1
+#define NRF24_CSN_PIN 7
+#define NRF24_CE_PORT 5
+#define NRF24_CE_PIN 4
 
 /* Stepper Motor Settings */
 #define STEPPER_MOTOR_PORT 2
