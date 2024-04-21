@@ -19,3 +19,4 @@ __pychache__
 ~$*.xlsx
 *backups/
 *_autosave*
+*.~*
