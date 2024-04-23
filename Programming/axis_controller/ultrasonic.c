@@ -18,10 +18,10 @@ static GpioConfig trigger_pin = GPIO_PIN_CONFIG(ULTRASONIC_TRIGGER_PORT, ULTRASO
 static GpioConfig echo_pin = { .port = ULTRASONIC_ECHO_PORT, .pin = ULTRASONIC_ECHO_PIN, .count = 1, .pinMode = GPIO_BIDIRECTIONAL_MODE,	.pinInterrupt = ENABLE_GPIO_PIN_INTERRUPT, .interruptTrigger = GPIO_RISING_EDGE, .wakeUpInterrupt = DISABLE_GPIO_PIN_WAKE_UP, \
 	DEFAULTS_PU_NCS  DEFAULTS_SR_DR_IE  };
 
-const char* ULTRASONIC_STATUS_TO_STRING[] = {
-  "ULTRASONIC_FIRST_RUN",
-  "ULTRASONIC_ACTIVE",
   "ULTRASONIC_IDLE",
+  "ULTRASONIC_ACTIVE",
+  "ULTRASONIC_FIRST_RUN",
+  const char* ULTRASONIC_STATUS_TO_STRING[] = {
   "ULTRASONIC_UNRESPONSIVE" 
 };
 
@@ -141,6 +141,7 @@ void processs_ultrasonic_phases(void) {
     /* printf("Current Ultrasonic status: %s\n", ULTRASONIC_STATUS_TO_STRING[ultrasonic_status]); */
     /* printf("Current Ultrasonic Phase: %s\n", ULTRASONIC_PHASE_TO_STRING[ultrasonic_current_phase]); */
 
+    /**/
     switch (ultrasonic_current_phase) {
 
       case ULTRASONIC_SEND_TRIGGER_PHASE:

@@ -15,7 +15,7 @@
  /* nRF24L01 settings */
 //uncomment to print all the nrf24l01 registers after setting them with nrf24_device()
 #define PRINT_NRF24_REGISTERS 
-#define NRF24_CSN_PORT 1
+#define NRF24_CSN_PORT 2
 #define NRF24_CSN_PIN 7
 #define NRF24_CE_PORT 5
 #define NRF24_CE_PIN 4
@@ -34,7 +34,6 @@
 #define ULTRASONIC_TRIGGER_PIN 3
 #define ULTRASONIC_ECHO_PORT 3
 #define ULTRASONIC_ECHO_PIN 2
-
 /* #define ULTRASONIC_STATE_MACHINE */
 
 
@@ -55,7 +54,8 @@
 
 // Others 
 #define LED_PORT 2
-#define LED_PIN 5
+#define LED_PIN 6
+/* #define GPIO_HAS_INT_WK */
 
 #include <STC/8H8KxxU/SKDIP28.h>
 #include <stdio.h>

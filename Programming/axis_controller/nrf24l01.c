@@ -90,8 +90,8 @@ void pinout_Initializer(void)
   gpioConfigure(&CSN_pin);
   gpioConfigure(&CE_pin);
 
-  gpioWrite(&CSN_pin, 0);
-  gpioWrite(&CE_pin, 1);
+  gpioWrite(&CSN_pin, SPI_OFF);
+  gpioWrite(&CE_pin, CE_OFF);
 
 }
 
