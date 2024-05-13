@@ -4,6 +4,7 @@ from micropython import const
 import time
 
 
+# Axis Control
 _RX_POLL_DELAY = const(15)
 _RESPONDER_SEND_DELAY = const(10)
 
@@ -28,3 +29,24 @@ nrf.start_listening()
 def move_abs(distance):
     global nrf
     nrf.send_ascii_m(f"M1i{distance}");
+
+
+# Water Distribution system
+L1 = const(0)
+L2 = const(1)
+S1 = const(0)
+S2 = const(1)
+S3 = const(2)
+L1S1_pin = const(3)
+L1S2_pin = const(4)
+L1S3_pin = const(5)
+L2S1_pin = const(6)
+L2S2_pin = const(7)
+L2S3_pin = const(8)
+solenoids = [ [Pin(L1S1_pin, Pin.OUT), Pin(L1S2_pin, Pin.OUT), Pin(L1S3_pin, Pin.OUT)],
+              [Pin(L2S1_pin, Pin.OUT), Pin(L2S2_pin, Pin.OUT), Pin(L2S3_pin, Pin.OUT)] ]
+
+def solenoid(l, s):
+    return solenoids[l-1][s-1]
+
+

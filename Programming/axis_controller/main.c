@@ -22,10 +22,10 @@ void main(void) {
 
   // Awaiting User picocom
   // TODO: add a debug switch that switches on this code for debug mode or ignore this code for normal mode
-  uint8_t initial_char = '0';
-  while (initial_char != 's') {
-    initial_char = uartGetCharacter(CONSOLE_UART, NON_BLOCKING);
-  }
+  /* uint8_t initial_char = '0'; */
+  /* while (initial_char != 's') { */
+  /*   initial_char = uartGetCharacter(CONSOLE_UART, NON_BLOCKING); */
+  /* } */
   uartSendBlock(CONSOLE_UART, "\rStarting..\n\n", 12, NON_BLOCKING);
 
   //initializing nrf24l01+ as a receiver device with one simpl function call
