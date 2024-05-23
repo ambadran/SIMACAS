@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMACAS</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .slider-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .slider {
+            writing-mode: bt-lr; /* IE */
+            -webkit-appearance: slider-vertical; /* WebKit */
+            width: 20px;
+            height: 300px;
+            margin: 0 20px;
+        }
+        .value {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIMACAS</h1>
+    <div class="slider-container">
+        <div>
+            <input type="range" min="0" max="1000" value="500" class="slider" id="slider1">
+            <div id="value1" class="value">500</div>
+        </div>
+        <div>
+            <input type="range" min="0" max="1000" value="500" class="slider" id="slider2">
+            <div id="value2" class="value">500</div>
+        </div>
+        <div>
+            <input type="range" min="0" max="1000" value="500" class="slider" id="slider3">
+            <div id="value3" class="value">500</div>
+        </div>
+    </div>
+    <script>
+        function sendSliderValue(sliderId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const valueSpan = document.getElementById(valueId);
+            slider.onmouseup = function() {
+                valueSpan.innerHTML = this.value;
+                const xhr = new XMLHttpRequest();
+                xhr.open("GET", "/update?slider=" + sliderId + "&value=" + this.value, true);
+                xhr.send();
+            }
+        }
+        sendSliderValue("slider1", "value1");
+        sendSliderValue("slider2", "value2");
+        sendSliderValue("slider3", "value3");
+    </script>
+</body>
+</html>
