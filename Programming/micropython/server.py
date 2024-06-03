@@ -28,7 +28,7 @@ def web_page():
         html = file.read()
     return html
 
-def server():
+def server(processing_func):
     ip = connect()
     if ip is None:
         return
@@ -52,14 +52,18 @@ def server():
             
             if 'GET /update' in request:
                 string = request[:request.find('\n')]
-                print(string)
-                # _, url_params = request.split(' ', 2)
-                # params = url_params.split(' ')[0]
-                # parsed_params = ure.parse_qs(params[8:])
-                # slider = parsed_params.get('slider')[0]
-                # value = parsed_params.get('value')[0]
-                # print(f"Slider: {slider}, Value: {value}")
-                # Here you can add the logic to use the slider values
+                print(f"Processing Axe")
+
+                str1 = string.split("GET /update?slider=slider")
+                str2 = str1[1].split("&value=")
+                axe_num = int(str2[0])
+                str3 = str2[1].split(" HTTP/1.1")
+                value = int(str3[0])
+
+
+                print(f"Processing Axe {axe_num} with value {value}\n\n")
+                processing_func(axe_num, int(value/10))
+
             else:
                 response = web_page()
                 cl.send(b"HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n")
@@ -71,5 +75,4 @@ def server():
         finally:
             cl.close()
 
-# Start the web server
-server()
+
