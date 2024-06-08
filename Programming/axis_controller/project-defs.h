@@ -66,7 +66,6 @@
 #include <spi-hal.h>
 #include <uart-hal.h>
 #include <serial-console.h>
-#include <stdio.h>
 #include <timer-hal.h>
 #include "stepper_motor.h"
 #include "nrf24l01.h"
