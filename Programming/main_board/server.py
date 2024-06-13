@@ -2,6 +2,9 @@ import network
 import socket
 import time
 import ure  # Import ure for parsing URLs
+from machine import Pin
+
+led = Pin("LED", Pin.OUT)
 
 def connect():
     ssid = "iPhone 15 Pro"
@@ -43,9 +46,12 @@ def server(processing_func):
     print(f"Listening on {ip}")
     
     while True:
+
         cl, addr = s.accept()
         print(f"Client connected from {addr}")
         try:
+            led.toggle()
+
             request = cl.recv(1024)
             request = request.decode('utf-8')
             # print(f"Request: {request}")
