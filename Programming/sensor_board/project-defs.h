@@ -8,17 +8,20 @@
 
 
 #include <STC/8H8KxxU/SOP16.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <delay.h>
 #include <gpio-hal.h>
 #include <uart-hal.h>
 #include <serial-console.h>
 #include <spi-hal.h>
-#include "protocol.h"
-#include "tempt6000.h"
+#include <adc-comp-hal.h>
+#include "temt6000.h"
 #include "dh11.h"
-#include "water_level.h"
+#include "soil_moisture.h"
 #include "mq135.h"
+#include "terminal.h"
+#include "protocol.h"
 
 
 #endif

@@ -148,7 +148,6 @@ LINE_STATUS terminal_execute_line(char* line) {
             break;
         }
 
-        break;
 
 #if ULTRASONIC_STATE_MACHINE
       case 'U':
