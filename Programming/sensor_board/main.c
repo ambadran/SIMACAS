@@ -4,20 +4,23 @@
 /**** MUST DECLARE INTERRUPTS IN MAIN.C FILE AS PER SDCC REQUIREMENT ****/
 
 
-/* static GpioConfig test_pin = GPIO_PIN_CONFIG(5, 4, GPIO_BIDIRECTIONAL_MODE); */
 
 void main(void) {
 
   // Inits / Deinits
   INIT_EXTENDED_SFR();
-  EA = 1; // enable interrupts
   serialConsoleInitialise(
       CONSOLE_UART, 
       CONSOLE_SPEED, 
       CONSOLE_PIN_CONFIG
       );
+  adcInitialise(ADC_ALIGN_RIGHT, DISABLE_INTERRUPT);
+  mq135_init();
+  dht11_init();
+  temt6000_init();
+  soil_moisture_init();
 
-  /* gpioConfigure(&test_pin); */
+  EA = 1; // enable interrupts
 
   // Main Routine
   protocol_main_loop();

@@ -109,25 +109,32 @@ LINE_STATUS terminal_execute_line(char* line) {
 
       case 'L':
         // Printing OUT the TEMT6000 sensor
-        printf("TEMT6000:%d\n", temt6000_last_value);
+        printf("TEMT6000:%d\n", get_temt6000_last_value());
 
         break;
  
-      case 'D':
+      case 'T':
         // Printing OUT the DHT11 sensor
-        printf("DHT11:%d\n", dht11_last_value);
+        printf("DHT11 Temperature:%d\n", get_dht11_temp_last_value());
 
         break;
 
-     case 'M':
+      case 'H':
+        // Printing OUT the DHT11 sensor
+        printf("DHT11 Humidity:%d\n", get_dht11_humidity_last_value());
+
+        break;
+
+
+      case 'M':
         // Printing OUT the MQ135 sensor
-        printf("MQ135:%d\n", mq135_last_value);
+        printf("MQ135:%d\n", get_mq135_last_value());
 
         break;
- 
-     case 'S':
+   
+      case 'S':
         // Printing OUT the Soil Moisture sensor
-        printf("SoilMoisture:%d\n", soil_moisture_last_value);
+        printf("SoilMoisture:%d\n", get_soil_moisture_last_value());
 
         break;
 

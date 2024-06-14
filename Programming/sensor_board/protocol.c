@@ -63,7 +63,28 @@ void protocol_main_loop(void) {
 
 
     /*** Reading All Sensors ***/
-    
+    /* DHT11_STATUS dht11_status = dht11_read(); */
+    mq135_read();
+    soil_moisture_read();
+    temt6000_read();
+    DHT11_STATUS dht11_status = DHT11_IDLE_SUCCESSFUL;
+    switch (dht11_status) {
+      case DHT11_NO_RESPONSE:
+        printf("DHT11 No Response!! \r");
+        break;
+
+      case DHT11_CHECKSUM_ERROR:
+        printf("DHT11 Checksum Error!! \r");
+        break;
+
+      case DHT11_IDLE_SUCCESSFUL:
+        // do nothing if read successful or in idle state
+        break;
+
+      default:
+        printf("DHT11 Unknown Status?!?!?!!\n\n");
+
+    }
     /*** Read All Sensors! ***/
 
 
