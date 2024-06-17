@@ -21,3 +21,6 @@ __pychache__
 *_autosave*
 *.~*
 ~$*
+Gcode/
+*.gcode
+*.nc
