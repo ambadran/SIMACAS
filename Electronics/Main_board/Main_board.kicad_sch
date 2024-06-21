@@ -2364,7 +2364,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 264.16 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 321d8616-0fbf-4a0e-84b8-d4896a65d085)
-    (property "Reference" "CAN_line" (at 257.81 77.47 0)
+    (property "Reference" "CAN_line1" (at 257.81 77.47 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TerminaBlock" (at 257.81 80.01 0)
@@ -2381,7 +2381,7 @@
     (instances
       (project "Main_board"
         (path "/7d596dee-6f09-4134-b16f-bd56a6d790ef"
-          (reference "CAN_line") (unit 1)
+          (reference "CAN_line1") (unit 1)
         )
       )
     )
@@ -2667,7 +2667,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x20") (at 158.75 96.52 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 51b7a589-5947-419b-a53a-8e2bb2df7f00)
-    (property "Reference" "Pico_W" (at 158.75 128.27 0)
+    (property "Reference" "Pico_W2" (at 158.75 128.27 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Conn_01x20" (at 158.75 125.73 0)
@@ -2702,7 +2702,7 @@
     (instances
       (project "Main_board"
         (path "/7d596dee-6f09-4134-b16f-bd56a6d790ef"
-          (reference "Pico_W") (unit 1)
+          (reference "Pico_W2") (unit 1)
         )
       )
     )
@@ -3681,7 +3681,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 262.89 106.68 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e2588d12-129f-4592-b022-640994886dee)
-    (property "Reference" "UART" (at 256.54 100.33 0)
+    (property "Reference" "UART1" (at 256.54 100.33 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Conn_01x02" (at 256.54 102.87 0)
@@ -3698,7 +3698,7 @@
     (instances
       (project "Main_board"
         (path "/7d596dee-6f09-4134-b16f-bd56a6d790ef"
-          (reference "UART") (unit 1)
+          (reference "UART1") (unit 1)
         )
       )
     )

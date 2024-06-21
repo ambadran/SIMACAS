@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMACAS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .nav-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .switch-container {
+            margin-top: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 20px 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .columns {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .column-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .label {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIMACAS</h1>
+    <div class="nav-buttons">
+        <button onclick="window.location.href='actuators.html'">Actuators</button>
+        <button onclick="window.location.href='sensors.html'">Sensors</button>
+        <button onclick="window.location.href='mpc.html'">MPC</button>
+    </div>
+    <div class="switch-container">
+        <div class="label" id="mpcLabel">MPC Deactivated</div>
+        <label class="switch">
+            <input type="checkbox" id="mpcSwitch" onchange="toggleMPC(this.checked)">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="columns">
+        <div class="column">
+            <div class="column-title">Avg. Temperature</div>
+            <div class="label" id="temperatureReal">Real Value: -- °C</div>
+            <div class="label" id="temperaturePredicted">Predicted Value: -- °C</div>
+            <div class="label" id="temperatureLED">LED Strip Value: --</div>
+        </div>
+        <div class="column">
+            <div class="column-title">Avg. Humidity</div>
+            <div class="label" id="humidityReal">Real Value: -- %</div>
+            <div class="label" id="humidityPredicted">Predicted Value: -- %</div>
+            <div class="label" id="humidityLED">LED Strip Value: --</div>
+        </div>
+        <div class="column">
+            <div class="column-title">Avg. CO2 Concentration</div>
+            <div class="label" id="co2Real">Real Value: -- PPM</div>
+            <div class="label" id="co2Predicted">Predicted Value: -- PPM</div>
+        </div>
+        <div class="column">
+            <div class="column-title">Avg. Soil Moisture</div>
+            <div class="label" id="soilMoistureReal">Real Value: -- kPa</div>
+            <div class="label" id="soilMoisturePredicted">Predicted Value: -- kPa</div>
+            <div class="label" id="soilMoistureWater">Water Channels: --</div>
+        </div>
+        <div class="column">
+            <div class="column-title">Avg. Light Intensity</div>
+            <div class="label" id="lightIntensityReal">Real Value: -- Lumens/m²</div>
+            <div class="label" id="lightIntensityPredicted">Predicted Value: -- Lumens/m²</div>
+            <div class="label" id="lightIntensityLED">LED Strip Value: --</div>
+        </div>
+    </div>
+    <script>
+        function toggleMPC(state) {
+            fetch('/toggle-mpc', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mpcEnabled: state })
+            })
+            .then(() => {
+                document.getElementById('mpcLabel').innerText = state ? "MPC Activated" : "MPC Deactivated";
+            })
+            .catch(error => console.error('Error toggling MPC:', error));
+        }
+
+        function updateMPCValues() {
+            fetch('/get-mpc-values')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperatureReal').innerText = `Real Value: ${data.temperatureReal} °C`;
+                    document.getElementById('temperaturePredicted').innerText = `Predicted Value: ${data.temperaturePredicted} °C`;
+                    document.getElementById('temperatureLED').innerText = `LED Strip Value: ${data.temperatureLED}`;
+                    
+                    document.getElementById('humidityReal').innerText = `Real Value: ${data.humidityReal} %`;
+                    document.getElementById('humidityPredicted').innerText = `Predicted Value: ${data.humidityPredicted} %`;
+                    document.getElementById('humidityLED').innerText = `LED Strip Value: ${data.humidityLED}`;
+                    
+                    document.getElementById('co2Real').innerText = `Real Value: ${data.co2Real} PPM`;
+                    document.getElementById('co2Predicted').innerText = `Predicted Value: ${data.co2Predicted} PPM`;
+                    
+                    document.getElementById('soilMoistureReal').innerText = `Real Value: ${data.soilMoistureReal} kPa`;
+                    document.getElementById('soilMoisturePredicted').innerText = `Predicted Value: ${data.soilMoisturePredicted} kPa`;
+                    document.getElementById('soilMoistureWater').innerText = `Water Channels: ${data.soilMoistureWater}`;
+                    
+                    document.getElementById('lightIntensityReal').innerText = `Real Value: ${data.lightIntensityReal} Lumens/m²`;
+                    document.getElementById('lightIntensityPredicted').innerText = `Predicted Value: ${data.lightIntensityPredicted} Lumens/m²`;
+                    document.getElementById('lightIntensityLED').innerText = `LED Strip Value: ${data.lightIntensityLED}`;
+                })
+                .catch(error => console.error('Error fetching MPC values:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const mpcSwitch = document.getElementById('mpcSwitch');
+            document.getElementById('mpcLabel').innerText = mpcSwitch.checked ? "MPC Activated" : "MPC Deactivated";
+        });
+
+        setInterval(updateMPCValues, 1000);
+    </script>
+</body>
+</html>

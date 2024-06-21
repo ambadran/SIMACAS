@@ -1,84 +1,98 @@
+'''
+Meant to run on the second Core of Pico for Optimal Performance
+    - Host Web App (HTML file including the CSS and JAVASCRIPT)
+    - Serve the HTML GET and POST requests
+    - Updates internal variables to control Actuators through other Core
+    - Updates the real-time Sensor values displayed on the Web App
+'''
+from micropython import const
+from machine import Pin
 import network
 import socket
+import json
 import time
-import ure  # Import ure for parsing URLs
-from machine import Pin
+# import random
 
-led = Pin("LED", Pin.OUT)
+class HTML_REQUEST:
+    GET_SENSOR_ACTUATOR = 0
+    POST_SWITCH = 1
+    GET_WEB = 2
 
-def connect():
-    ssid = "iPhone 15 Pro"
-    password = "dnjdjcnd"
-    
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(ssid, password)
-    
-    while not wlan.isconnected() and wlan.status() == network.STAT_CONNECTING:
-        print("Connecting to Wi-Fi...")
-        time.sleep(1)
-    
-    if wlan.isconnected():
-        print("Connected to Wi-Fi")
-        print("IP Address:", wlan.ifconfig()[0])
-        return wlan.ifconfig()[0]
-    else:
-        print("Failed to connect to Wi-Fi")
-        return None
+class Server:
+    # Access Point Parameters
+    SSID = const("SIMACAS")
+    PASSWORD = const("12345678")
 
-def web_page():
-    with open('index.html', 'r') as file:
-        html = file.read()
-    return html
+    ON_OFF_MAPPING = {'on': 1, 'off': 0}
+    def __init__(self):
+        '''
+        initiate server
+        '''
+        self.led = Pin("LED", Pin.OUT)  # on-board LED to show state
+        self.led.off()
 
-def server(processing_func):
-    ip = connect()
-    if ip is None:
-        return
+        self.reset()
+        #TODO: implement try except block to avoid redefining socket
+        self.init_access_point()
+        self.init_socket()
 
-    addr = socket.getaddrinfo(ip, 80)[0][-1]
-    
-    s = socket.socket()
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(addr)
-    s.listen(5)
-    
-    print(f"Listening on {ip}")
-    
-    while True:
+        # should've been class method but contain self
+        self.HANDLE_HTML_REQUEST = {HTML_REQUEST.GET_SENSOR_ACTUATOR: self.handle_get_values,
+                               HTML_REQUEST.POST_SWITCH: self.handle_post_switches,
+                               HTML_REQUEST.GET_WEB: self.handle_get_web}
+ 
+    def reset(self):
+        '''
+        returns station object on reset.
+        just deactivate and activate again 
+        '''
+        self.station = network.WLAN(network.AP_IF)
 
-        cl, addr = s.accept()
-        print(f"Client connected from {addr}")
-        try:
-            led.toggle()
+        self.station.active(False)
+        time.sleep(2)
+        self.station.active(True)
 
-            request = cl.recv(1024)
-            request = request.decode('utf-8')
-            # print(f"Request: {request}")
-            
-            if 'GET /update' in request:
-                string = request[:request.find('\n')]
-                print(f"Processing Axe")
+    def init_access_point(self):
+        '''
+        set up the Access Point
+        '''
+        self.station.config(ssid=self.SSID, password=self.PASSWORD)
 
-                str1 = string.split("GET /update?slider=slider")
-                str2 = str1[1].split("&value=")
-                axe_num = int(str2[0])
-                str3 = str2[1].split(" HTTP/1.1")
-                value = int(str3[0])
+        while not self.station.active():
+            print(f"Station Initializing.. ", end=' \r')
 
+        self.led.on()
+        print('Access Point Active!')
+        print(self.station.ifconfig())
 
-                print(f"Processing Axe {axe_num} with value {value}\n\n")
-                processing_func(axe_num, int(value/10))
+    def init_socket(self):
+        '''
+        initiate socket connection
+        '''
+        self.addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+        self.s = socket.socket()
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.s.bind(self.addr)
+        self.s.listen(1)  # Reduce the backlog to minimize memory usage
+        print('Listening on', self.addr)
 
-            else:
-                response = web_page()
-                cl.send(b"HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n")
-                cl.send(response.encode('utf-8'))
+    def web_page(self):
+        '''
+        return the HTML page
+        '''
+        with open('index.html', 'r') as f:
+            web_page = f.read()
 
-        except Exception as e:
-            print(f"Error handling request: {e}")
+        return web_page
 
-        finally:
-            cl.close()
+    def wait_for_client(self):
+        '''
+        Await client to connect then return new socket object used to 
+        communicate with the connected client. 
+        This socket is distinct from the listening socket (s) 
+        and is used for sending and receiving data with the specific client that connected.
+        '''
+        self.client, addr = self.s.accept()
+        print('Got a connection from %s' % str(addr))
 
 

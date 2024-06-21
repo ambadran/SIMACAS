@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMACAS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .nav-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px;
+            width: 40%;
+            box-sizing: border-box;
+        }
+
+        .box-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .sensor-label {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIMACAS</h1>
+    <div class="nav-buttons">
+        <button onclick="window.location.href='actuators.html'">Actuators</button>
+        <button onclick="window.location.href='sensors.html'">Sensors</button>
+        <button onclick="window.location.href='mpc.html'">MPC</button>
+    </div>
+    <div class="container">
+        <div class="box">
+            <div class="box-title">Sensor Board 1</div>
+            <div class="sensor-label" id="temperature1">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity1">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture1">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity1">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration1">CO2 Concentration: -- PPM</div>
+        </div>
+        <div class="box">
+            <div class="box-title">Sensor Board 2</div>
+            <div class="sensor-label" id="temperature2">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity2">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture2">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity2">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration2">CO2 Concentration: -- PPM</div>
+        </div>
+        <div class="box">
+            <div class="box-title">Sensor Board 3</div>
+            <div class="sensor-label" id="temperature3">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity3">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture3">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity3">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration3">CO2 Concentration: -- PPM</div>
+        </div>
+        <div class="box">
+            <div class="box-title">Sensor Board 4</div>
+            <div class="sensor-label" id="temperature4">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity4">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture4">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity4">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration4">CO2 Concentration: -- PPM</div>
+        </div>
+        <div class="box">
+            <div class="box-title">Sensor Board 5</div>
+            <div class="sensor-label" id="temperature5">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity5">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture5">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity5">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration5">CO2 Concentration: -- PPM</div>
+        </div>
+        <div class="box">
+            <div class="box-title">Sensor Board 6</div>
+            <div class="sensor-label" id="temperature6">Temperature: -- °C</div>
+            <div class="sensor-label" id="humidity6">Humidity: -- %</div>
+            <div class="sensor-label" id="soilMoisture6">Soil Moisture: -- kPa</div>
+            <div class="sensor-label" id="lightIntensity6">Light Intensity: -- Lumens/m²</div>
+            <div class="sensor-label" id="co2Concentration6">CO2 Concentration: -- PPM</div>
+        </div>
+    </div>
+    <script>
+        function updateSensors() {
+            fetch('/get-sensor-data')
+                .then(response => response.json())
+                .then(data => {
+                    for (let i = 1; i <= 6; i++) {
+                        document.getElementById(`temperature${i}`).innerText = `Temperature: ${data[`temperature${i}`]} °C`;
+                        document.getElementById(`humidity${i}`).innerText = `Humidity: ${data[`humidity${i}`]} %`;
+                        document.getElementById(`soilMoisture${i}`).innerText = `Soil Moisture: ${data[`soilMoisture${i}`]} kPa`;
+                        document.getElementById(`lightIntensity${i}`).innerText = `Light Intensity: ${data[`lightIntensity${i}`]} Lumens/m²`;
+                        document.getElementById(`co2Concentration${i}`).innerText = `CO2 Concentration: ${data[`co2Concentration${i}`]} PPM`;
+                    }
+                })
+                .catch(error => console.error('Error fetching sensor data:', error));
+        }
+
+        setInterval(updateSensors, 1000);
+    </script>
+</body>
+</html>

@@ -11,6 +11,8 @@
 #define MQ135_TO_PPM 1  // Particles Per Million  (CO2 availability in atmosphere)
 #define TEMT6000_TO_LUMENS_M2 1  // Lumens per meter squared  (light intensity)
 #define SOIL_MOISTURE_TO_KPA 1  // Kilo-Pascals  (soil water tension)
+#define DHT11_TO_CELCIUS 1  // degree celcius (temperature)                              
+#define DHT11_TO_PERCENT 1  // Percentage (of Humidity)
 
 /* Console settings */
 #define CONSOLE_SPEED 115200

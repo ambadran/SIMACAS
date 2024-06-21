@@ -65,8 +65,8 @@ DHT11_STATUS dht11_read(void) {
       return DHT11_CHECKSUM_ERROR;
     }
 
-    dht11_humidity_last_value = data[0];
-    dht11_temp_last_value = data[2];
+    dht11_humidity_last_value = data[0] * DHT11_TO_PERCENT;
+    dht11_temp_last_value = data[2] * DHT11_TO_CELCIUS;
 
     return DHT11_IDLE_SUCCESSFUL;
 }
