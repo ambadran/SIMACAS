@@ -147,6 +147,7 @@ LINE_STATUS terminal_execute_line(char* line) {
             distance = int_value;
             break;
         }
+        break;
 
 
 #if ULTRASONIC_STATE_MACHINE
@@ -174,7 +175,7 @@ LINE_STATUS terminal_execute_line(char* line) {
             break;
 
         }
-        break;
+        break;  //TODO: for some reason this break is needed for proper running
 #endif
 
       case 'D':

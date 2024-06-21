@@ -5,6 +5,9 @@ import time
 from server import server
 
 # Axis Control
+AXIS_CHANNEL = {0: 40,
+                1: 46,
+                2: 58}
 _RX_POLL_DELAY = const(15)
 _RESPONDER_SEND_DELAY = const(10)
 
@@ -31,6 +34,8 @@ nrf.start_listening()
 
 def move_abs(axe_num, distance):
     global nrf
+    nrf.set_channel(AXIS_CHANNEL[axe_num])
+    time.sleep_ms(300)
     nrf.send_ascii_m(f"M1i{distance}");
 
 # def move_rel(axe_num, distance):

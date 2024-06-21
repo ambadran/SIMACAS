@@ -1,6 +1,12 @@
 #ifndef PROJECT_DEFS_H
 #define PROJECT_DEFS_H
 
+/* AXIS NUMBER */
+/* There are 3 axis in this system each communicating with the Main MCU through the nRF24L01
+ * This means that each axis should use a different channel for communication
+ */
+#define AXIS_CHANNEL 58
+
  /* SPI settings */
 #define SPI_PIN_CONFIG 0
 #define SPI_SPEED 4000000UL
