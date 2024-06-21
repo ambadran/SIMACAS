@@ -11,6 +11,8 @@ class AxisControl:
     '''
     Abstraction for controlling Axis Movements by sending Gcode through nRF24l01 Radio Transceiver
     '''
+    DEFAULT_NUDGE_VALUE = 5
+
     SPI_HARDWARE_INDEX = const(0)
     DEFAULT_PAYLOAD_SIZE = const(16)
     AXIS_CHANNEL = {0: 40,
@@ -30,6 +32,8 @@ class AxisControl:
         self.nrf.open_rx_pipe(1, self.PIPES[1])
         self.nrf.start_listening()
 
+        self.positions = [0, 0, 0]
+
     def move(self, axe_num, distance):
         '''
         Relative Movement Command. 
@@ -37,7 +41,21 @@ class AxisControl:
         '''
         self.nrf.set_channel(self.AXIS_CHANNEL[axe_num])
         sleep_ms(300)
-        self.nrf.send_ascii_m(f"M1i{distance}");
+        self.nrf.send_ascii_m(f"M1i{distance}")
+
+    def forward(self, axe_num):
+        '''
+        Nudge forward a certain Axe
+        '''
+        self.move(axe_num, self.DEFAULT_NUDGE_VALUE)
+        self.positions[axe_num] += 1
+
+    def backwards(self, axe_num):
+        '''
+        Nudge backwards a certain Axe
+        '''
+        self.move(axe_num, -self.DEFAULT_NUDGE_VALUE)
+        self.positions[axe_num] -= 1
 
     # @property
     # def position0(self):
