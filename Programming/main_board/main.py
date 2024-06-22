@@ -5,29 +5,7 @@ from server import Server
 from time import sleep, sleep_ms
 import _thread
 
-# class GlobalVars:
-#     '''
-#     Convenience Object for inter-core communication
-#     '''
-#     def __init__(self):
-#         # -1 backwards, 0 No movement, 1 forward
-#         self.mechanism1: int = 0
-#         self.mechanism2: int = 0
-#         self.mechanism3: int = 0
-
-#         self.water1: bool = False
-#         self.water2: bool = False
-#         self.water3: bool = False
-
-#         self.fertilizer1: bool = False
-#         self.fertilizer2: bool = False
-#         self.fertilizer3: bool = False
-
-#         self.light1: int = 50
-#         self.light2: int = 50
-#         self.light3: int = 50
-# global_vars = GlobalVars()
-global_vars = {
+actuators_dict = {
        'mechanism1': 0,
        'mechanism2': 0,
        'mechanism3': 0,
@@ -41,8 +19,9 @@ global_vars = {
        'light2': 50,
        'light3': 50
        }
-
-
+mpc_dict = {
+        'mpcEnabled': False,
+        }
 
 def ControllerCore():
     '''
@@ -52,47 +31,60 @@ def ControllerCore():
         - Executes MPC control Algorithm
         - Saves Sensor Data Globally and executes Global Actuators States
     '''
-    global global_vars
+    global actuators_dict
+    global mpc_dict
     sensors = Sensors()
     actuators = Actuators()
     mpc = MPC(sensors, actuators)
 
     while True:
-        print(global_vars, end=' \r')
+        print(actuators_dict, end=' \r')
 
-        #### Handling Actuators ####
-        # 1- Handling Axe Position
-        while global_vars['mechanism1'] != actuators.axis.positions[0]:
-            if global_vars['mechanism1'] > actuators.axis.positions[0]:
-                actuators.axis.forward(0)
-            elif global_vars['mechanism1'] < actuators.axis.positions[0]:
-                actuators.axis.backwards(0)
+        if mpc_dict['mpcEnabled']:
+            ################### MPC ALgorithm ##################
+            mpc.run()
+            ####################################################
 
-        while global_vars['mechanism2'] != actuators.axis.positions[1]:
-            if global_vars['mechanism2'] > actuators.axis.positions[1]:
-                actuators.axis.forward(1)
-            elif global_vars['mechanism2'] < actuators.axis.positions[1]:
-                actuators.axis.backwards(1)
 
-        while global_vars['mechanism3'] != actuators.axis.positions[2]:
-            if global_vars['mechanism3'] > actuators.axis.positions[2]:
-                actuators.axis.forward(2)
-            elif global_vars['mechanism3'] < actuators.axis.positions[2]:
-                actuators.axis.backwards(2)
+        else:
+            ################ Handling Actuators ################
 
-        # 2- Handling Water / Fertilizer Channels
-        actuators.distribution0.r1.value( global_vars['water1'] )
-        actuators.distribution0.r2.value( global_vars['water2'] )
-        actuators.distribution0.r3.value( global_vars['water3'] )
+            # Firstly, stopping MPC algorithm to allow only-user control
+            mpc.pause()
 
-        actuators.distribution1.r1.value( global_vars['fertilizer1'] )
-        actuators.distribution1.r2.value( global_vars['fertilizer2'] )
-        actuators.distribution1.r3.value( global_vars['fertilizer3'] )
+            # 1- Handling Axe Position
+            while actuators_dict['mechanism1'] != actuators.axis.positions[0]:
+                if actuators_dict['mechanism1'] > actuators.axis.positions[0]:
+                    actuators.axis.forward(0)
+                elif actuators_dict['mechanism1'] < actuators.axis.positions[0]:
+                    actuators.axis.backwards(0)
 
-        # 3- Handling LED Strips PWM
-        actuators.led_strip0.duty( global_vars['light1'] )
-        actuators.led_strip1.duty( global_vars['light2'] )
-        actuators.led_strip2.duty( global_vars['light3'] )
+            while actuators_dict['mechanism2'] != actuators.axis.positions[1]:
+                if actuators_dict['mechanism2'] > actuators.axis.positions[1]:
+                    actuators.axis.forward(1)
+                elif actuators_dict['mechanism2'] < actuators.axis.positions[1]:
+                    actuators.axis.backwards(1)
+
+            while actuators_dict['mechanism3'] != actuators.axis.positions[2]:
+                if actuators_dict['mechanism3'] > actuators.axis.positions[2]:
+                    actuators.axis.forward(2)
+                elif actuators_dict['mechanism3'] < actuators.axis.positions[2]:
+                    actuators.axis.backwards(2)
+
+            # 2- Handling Water / Fertilizer Channels
+            actuators.distribution0.r1.value( actuators_dict['water1'] )
+            actuators.distribution0.r2.value( actuators_dict['water2'] )
+            actuators.distribution0.r3.value( actuators_dict['water3'] )
+
+            actuators.distribution1.r1.value( actuators_dict['fertilizer1'] )
+            actuators.distribution1.r2.value( actuators_dict['fertilizer2'] )
+            actuators.distribution1.r3.value( actuators_dict['fertilizer3'] )
+
+            # 3- Handling LED Strips PWM
+            actuators.led_strip0.duty( actuators_dict['light1'] )
+            actuators.led_strip1.duty( actuators_dict['light2'] )
+            actuators.led_strip2.duty( actuators_dict['light3'] )
+        ####################################################
 
         sleep(0.5)
 
@@ -104,7 +96,8 @@ def ServerCore():
         - Updates internal variables to control Actuators through other Core
         - Updates the real-time Sensor values displayed on the Web App
     '''
-    global global_vars
+    global actuators_dict
+    global mpc_dict
 
     server = Server()
 
@@ -113,7 +106,8 @@ def ServerCore():
 
         server.handle_html_request(server.identify_html_request())
 
-        global_vars.update(server.actuators_dict)
+        actuators_dict.update(server.actuators_dict)
+        mpc_dict.update(server.mpc_dict)
 
         server.led.toggle()
 
@@ -122,10 +116,15 @@ def ServerCore():
 
 #### Running Both Cores ####
 def main():
+    sleep(2)
     _thread.start_new_thread(ControllerCore, ())
+    sleep(2)
     ServerCore()
 
+# Main Routine
+sleep(2)
 _thread.start_new_thread(ControllerCore, ())
+sleep(2)
 ServerCore()
 
 

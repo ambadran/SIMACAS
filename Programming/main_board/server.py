@@ -53,8 +53,12 @@ class Server:
                'fertilizer3': 0,
                'light1': 50,
                'light2': 50,
-               'light3': 50
+               'light3': 50,
                }
+
+        self.mpc_dict = {
+               'mpcEnabled': False,
+                }
 
         self.IDENTIFY_HTML_REQUEST = {
                 'GET /': HTML_REQUEST.GET_ACTUATORS_WEB,
@@ -83,6 +87,7 @@ class Server:
         just deactivate and activate again 
         '''
         self.station = network.WLAN(network.AP_IF)
+        self.station.config(ssid=self.SSID, password=self.PASSWORD)
 
         self.station.active(False)
         sleep(2)
@@ -262,8 +267,8 @@ class Server:
         #TODO:
         length = int(self.request.split('Content-Length: ')[1].split('\r\n')[0])
         body = json.loads(self.client.recv(length).decode('utf-8'))
-        mpc_enabled = body['mpcEnabled']
-        print('MPC State:', 'Enabled' if mpc_enabled else 'Disabled')
+
+        self.mpc_dict['mpcEnabled'] = True if mpc_enabled else False
 
         response = 'HTTP/1.1 200 OK\r\n\r\n'
         self.client.send(response)
