@@ -5,6 +5,14 @@ from server import Server
 from time import sleep, sleep_ms
 import _thread
 
+sensors_dict = {
+        'temperature': 0,
+        'humidity': 0,
+        'soilMoisture': 0,
+        'lightIntensity': 0,
+        'co2Concentration': 0
+        }
+
 actuators_dict = {
        'mechanism1': 0,
        'mechanism2': 0,
@@ -33,12 +41,23 @@ def ControllerCore():
     '''
     global actuators_dict
     global mpc_dict
+    global sensors_dict
+
     sensors = Sensors()
     actuators = Actuators()
     mpc = MPC(sensors, actuators)
 
     while True:
         print(actuators_dict, end=' \r')
+
+
+        ################# Sensors Reading ##################
+        sensors_dict['temperature'] = sensors.temperature
+        sensors_dict['humidity'] = sensors.humidity
+        sensors_dict['soilMoisture'] = sensors.soil_moisture
+        sensors_dict['co2Concentration'] = sensors.CO2
+        sensors_dict['lightIntensity'] = sensors.light_intensity
+        ####################################################
 
         if mpc_dict['mpcEnabled']:
             ################### MPC ALgorithm ##################
@@ -98,6 +117,7 @@ def ServerCore():
     '''
     global actuators_dict
     global mpc_dict
+    global sensors_dict
 
     server = Server()
 
@@ -106,8 +126,14 @@ def ServerCore():
 
         server.handle_html_request(server.identify_html_request())
 
+        # Read User Actuator Controls
         actuators_dict.update(server.actuators_dict)
+
+        # Read MPC Mode
         mpc_dict.update(server.mpc_dict)
+
+        # Send Sensor Data
+        server.sensors_dict.update(sensors_dict)
 
         server.led.toggle()
 

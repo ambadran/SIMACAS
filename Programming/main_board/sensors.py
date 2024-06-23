@@ -10,5 +10,59 @@ This is Done by communicating to the sensor Board through UART or CAN
         -   'M': returns the CO2 value (PPM) from the MQ135 Sensor
         -   'S': returns Water Tension value (Kilo-Pascals) from the Soil Moisture Sensor
 '''
+from can_protocol import CAN
+from random import getrandbits
+
 class Sensors:
-    pass
+    '''
+    Abstraction object to easily read all sensors
+    '''
+    def __init__(self):
+        pass
+
+    @property
+    def temperature(self):
+        '''
+        send CAN packet to 'T' and read reply to get Temperature value
+        '''
+        #TODO:
+        return 26 + getrandbits(2)
+
+    @property
+    def humidity(self):
+        '''
+        send CAN packet to 'H' and read reply to get Temperature value
+        '''
+        #TODO:
+        return 16 + getrandbits(2)
+
+    @property
+    def light_intensity(self):
+        '''
+        send CAN packet to 'L' and read reply to get Temperature value
+        '''
+        #TODO:
+        return getrandbits(1)
+
+    @property
+    def CO2(self):
+        '''
+        send CAN packet to 'M' and read reply to get Temperature value
+        '''
+        #TODO:
+        return 593 + getrandbits(5)
+
+    @property
+    def soil_moisture(self):
+        '''
+        send CAN packet to 'M' and read reply to get Temperature value
+        '''
+        #TODO:
+        return 60 + getrandbits(5)
+
+
+
+
+
+
+

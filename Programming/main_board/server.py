@@ -41,6 +41,15 @@ class Server:
         self.init_access_point()
         self.init_socket()
 
+        #TODO: redefine this datastructure to hold sensor data for 6 different modules
+        sensors_dict = {
+                'temperature': 0,
+                'humidity': 0,
+                'soilMoisture': 0,
+                'lightIntensity': 0,
+                'co2Concentration': 0
+                }
+
         self.actuators_dict = {
                'mechanism1': 0,
                'mechanism2': 0,
@@ -199,7 +208,7 @@ class Server:
         '''
         #TODO: this is just for testing now
         sensor_data = {
-            "temperature1": 1, "humidity1": 2, "soilMoisture1": 3, "lightIntensity1": 4, "co2Concentration1": 6,
+            "temperature1": self.sensors_dict['temperature'], "humidity1": self.sensors_dict['humidity'], "soilMoisture1": self.sensors_dict['soilMoisture'], "lightIntensity1": self.sensors_dict['lightIntensity'], "co2Concentration1": self.sensors_dict['co2Concentration'],
             "temperature2": 0, "humidity2": 0, "soilMoisture2": 0, "lightIntensity2": 0, "co2Concentration2": 0,
             "temperature3": 0, "humidity3": 0, "soilMoisture3": 0, "lightIntensity3": 0, "co2Concentration3": 0,
             "temperature4": 0, "humidity4": 0, "soilMoisture4": 0, "lightIntensity4": 0, "co2Concentration4": 0,
