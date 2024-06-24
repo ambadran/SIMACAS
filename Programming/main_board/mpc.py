@@ -2,6 +2,8 @@
 MPC Algorithm Implementation
 '''
 from machine import Timer
+from time import sleep_ms
+
 class SyncedMove:
     '''
     Object to handle the Synced Move where all 
@@ -36,15 +38,18 @@ class SyncedMove:
         '''
         self.timer.deinit()
         
-    def one_step(self):
+    def one_step(self, t):
         '''
         THIS METHOD IS MADE TO RUN UNDER A WHILE TRUE
         IT'S BASICALLY A ONE STEP THAT NEEDS TO BE REPEATED
         '''
         if self.nudges_moved <= self.MAX_NUDGE_NUM:
             self.axis.move(0, self.axis.DEFAULT_NUDGE_VALUE * self.state)
+            sleep_ms(10)
             self.axis.move(1, self.axis.DEFAULT_NUDGE_VALUE * self.state)
+            sleep_ms(10)
             self.axis.move(2, self.axis.DEFAULT_NUDGE_VALUE * self.state)
+            sleep_ms(10)
 
             self.nudges_moved += 1
 
@@ -60,15 +65,19 @@ class MPC:
 
         self.synced_move = SyncedMove(actuators.axis)
 
+        self.state = False
+
     def run(self):
         '''
         runs all MPC routine
         '''
+        self.state = True
         self.synced_move.run()
 
     def pause(self):
         '''
         pauses all MPC routines
         '''
+        self.state = False
         self.synced_move.pause()
 

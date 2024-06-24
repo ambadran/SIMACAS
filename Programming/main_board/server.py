@@ -42,7 +42,7 @@ class Server:
         self.init_socket()
 
         #TODO: redefine this datastructure to hold sensor data for 6 different modules
-        sensors_dict = {
+        self.sensors_dict = {
                 'temperature': 0,
                 'humidity': 0,
                 'soilMoisture': 0,
@@ -158,7 +158,8 @@ class Server:
         self.request = self.client.recv(1024).decode()
         
         tmp = self.request.split(' ')
-        tmp = tmp[0] + ' ' + tmp[1]
+        if len(tmp) > 1:
+            tmp = tmp[0] + ' ' + tmp[1]
 
         return self.IDENTIFY_HTML_REQUEST.get(tmp, None)
 
@@ -176,6 +177,8 @@ class Server:
 
         except Exception as e:
             print(f"Error in handle web get request: {e}")
+            print(f"html request detected: {html_request}")
+            print(f"Raw html request:\n{self.request}")
 
         finally:
             self.client.close()
@@ -234,7 +237,6 @@ class Server:
             "soilMoistureReal": 0, "soilMoisturePredicted": 1, "soilMoistureWater": "CLOSED",
             "lightIntensityReal": 9, "lightIntensityPredicted": 7, "lightIntensityLED": 4
         }
-        print("handling mpc values request")
 
         response = json.dumps(mpc_values)
 
@@ -277,7 +279,9 @@ class Server:
         length = int(self.request.split('Content-Length: ')[1].split('\r\n')[0])
         body = json.loads(self.client.recv(length).decode('utf-8'))
 
-        self.mpc_dict['mpcEnabled'] = True if mpc_enabled else False
+        print(f"MPC POST:\n{self.request}\nBody: {body}")
+
+        self.mpc_dict['mpcEnabled'] = body['mpcEnabled'] 
 
         response = 'HTTP/1.1 200 OK\r\n\r\n'
         self.client.send(response)

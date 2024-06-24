@@ -48,7 +48,7 @@ def ControllerCore():
     mpc = MPC(sensors, actuators)
 
     while True:
-        print(actuators_dict, end=' \r')
+        # print(actuators_dict, end=' \r')
 
 
         ################# Sensors Reading ##################
@@ -59,9 +59,11 @@ def ControllerCore():
         sensors_dict['lightIntensity'] = sensors.light_intensity
         ####################################################
 
+        print(f"MPC state: {mpc_dict['mpcEnabled']}")
         if mpc_dict['mpcEnabled']:
             ################### MPC ALgorithm ##################
-            mpc.run()
+            if not mpc.state:
+                mpc.run()
             ####################################################
 
 
@@ -69,7 +71,8 @@ def ControllerCore():
             ################ Handling Actuators ################
 
             # Firstly, stopping MPC algorithm to allow only-user control
-            mpc.pause()
+            if mpc.state:
+                mpc.pause()
 
             # 1- Handling Axe Position
             while actuators_dict['mechanism1'] != actuators.axis.positions[0]:
@@ -122,8 +125,11 @@ def ServerCore():
     server = Server()
 
     while True:
-        server.wait_for_client()
+        # Send Sensor Data
+        server.sensors_dict.update(sensors_dict)
 
+        # Host Server
+        server.wait_for_client()
         server.handle_html_request(server.identify_html_request())
 
         # Read User Actuator Controls
@@ -132,9 +138,7 @@ def ServerCore():
         # Read MPC Mode
         mpc_dict.update(server.mpc_dict)
 
-        # Send Sensor Data
-        server.sensors_dict.update(sensors_dict)
-
+        # Toggle LED for User
         server.led.toggle()
 
         print('\n')
@@ -142,13 +146,13 @@ def ServerCore():
 
 #### Running Both Cores ####
 def main():
-    sleep(2)
+    sleep(5)
     _thread.start_new_thread(ControllerCore, ())
     sleep(2)
     ServerCore()
 
 # Main Routine
-sleep(2)
+sleep(5)
 _thread.start_new_thread(ControllerCore, ())
 sleep(2)
 ServerCore()
