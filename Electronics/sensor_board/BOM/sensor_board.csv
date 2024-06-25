@@ -1,0 +1,13 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"C1";"C_Disc_D5.0mm_W2.5mm_P5.00mm";1;"10nF";;;
+2;"U1";"TO-220-3_Vertical";1;"L7805";;;
+3;"TEMP6000,DHT11";"JST_EH_B3B-EH-A_1x03_P2.50mm_Vertical";2;"JST-3p";;;
+4;"PowerIn1,UART1";"JST_EH_B2B-EH-A_1x02_P2.50mm_Vertical";2;"JST-2p";;;
+5;"MQ135,SoilMoisture1";"JST_EH_B4B-EH-A_1x04_P2.50mm_Vertical";2;"JST-4p";;;
+6;"MCP2515";"PinSocket_1x06_P2.54mm_Vertical";1;"PinHeader6p";;;
+7;"bridge1";"R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal";1;"0";;;
+8;"STC8H8K64U1";"DIP-16_W7.62mm_LongPads";1;"SOP16_case";;;
+9;"MCU_Debug1";"PinSocket_1x03_P2.54mm_Vertical";1;"1x3_Socket";;;
+10;"C2";"CP_Radial_D6.3mm_P2.50mm";1;"220uf";;;
+11;"D1";"D_DO-41_SOD81_P10.16mm_Horizontal";1;"1N5817";;;
+12;"R1";"R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal";1;"200";;;
